@@ -104,5 +104,5 @@ class IndexSearcher:
 class SearchIndexCorrupt(StandardError):
   pass
 
-
-searcher = IndexSearcher(settings.INDEX_FILE)
+# Disable searcher until we want to work on fixing the search functionality.
+searcher = None #IndexSearcher(settings.INDEX_FILE)
