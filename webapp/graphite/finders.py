@@ -2,15 +2,15 @@ import os
 import fnmatch
 from os.path import islink, isdir, isfile, realpath, join, dirname, basename
 from glob import glob
-from ceres import CeresTree, CeresNode, setDefaultSliceCachingBehavior
 from graphite.node import BranchNode, LeafNode
-from graphite.readers import CeresReader, WhisperReader, GzippedWhisperReader, RRDReader
+from graphite.readers import WhisperReader, GzippedWhisperReader, RRDReader, MetricfireReader
 from graphite.util import find_escaped_pattern_fields
 
 from graphite.logger import log
 
 #setDefaultSliceCachingBehavior('all')
 
+import redis
 
 class CeresFinder:
   def __init__(self, directory):
@@ -31,6 +31,26 @@ class CeresFinder:
 
       elif isdir(fs_path):
         yield BranchNode(metric_path)
+
+class MetricfireFinder:
+   def find_nodes(self, query):
+      r = redis.Redis()
+
+      if query.pattern.endswith(".*"):
+         patternroot = query.pattern[:-1]
+      else:
+         patternroot = ""
+
+      metrics = [metric.split("/")[2] for metric in r.smembers("user_0_metrics")]
+      
+      for metric in match_entries(metrics, query.pattern):
+         metric = metric[len(patternroot):]
+         levels = metric.split(".")
+         
+         if len(levels) == 1:
+            yield LeafNode(levels[0], MetricfireReader())
+         else:
+            yield BranchNode(levels[0])
 
 
 class StandardFinder:

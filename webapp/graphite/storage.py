@@ -6,7 +6,7 @@ from graphite.remote_storage import RemoteStore
 from graphite.node import LeafNode
 from graphite.intervals import Interval, IntervalSet
 from graphite.readers import MultiReader
-from graphite.finders import CeresFinder, StandardFinder
+from graphite.finders import StandardFinder, MetricfireFinder
 
 
 class Store:
@@ -148,7 +148,8 @@ class FindQuery:
 
 # Exposed Storage API
 finders = [
-  CeresFinder(settings.CERES_DIR),
-  StandardFinder(settings.STANDARD_DIRS),
+#  CeresFinder(settings.CERES_DIR),
+#  StandardFinder(settings.STANDARD_DIRS),
+   MetricfireFinder()
 ]
 STORE = Store(finders, hosts=settings.CLUSTER_SERVERS)

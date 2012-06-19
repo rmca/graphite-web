@@ -22,9 +22,9 @@ urlpatterns = patterns('',
   ('^admin/', include(admin.site.urls)),
   ('^render/?', include('graphite.render.urls')),
   ('^cli/?', include('graphite.cli.urls')),
-  ('^composer/?', include('graphite.composer.urls')),
+  ('^hg/waf/composer/?', include('graphite.composer.urls')),
   ('^metrics/?', include('graphite.metrics.urls')),
-  ('^browser/?', include('graphite.browser.urls')),
+  ('^hg/waf/browser/?', include('graphite.browser.urls')),
   ('^account/?', include('graphite.account.urls')),
   ('^dashboard/?', include('graphite.dashboard.urls')),
   ('^whitelist/?', include('graphite.whitelist.urls')),
@@ -32,7 +32,7 @@ urlpatterns = patterns('',
   ('graphlot/', include('graphite.graphlot.urls')),
   ('^version/', include('graphite.version.urls')),
   ('^events/', include('graphite.events.urls')),
-  ('', 'graphite.browser.views.browser'),
+  ('', 'graphite.browser.views.browser')
 )
 
 handler500 = 'graphite.views.server_error'

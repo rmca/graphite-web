@@ -263,3 +263,10 @@ class RRDReader:
         retention_points = points
 
     return  retention_points * info['step']
+
+class MetricfireReader:
+   def get_intervals(self):
+      return IntervalSet([Interval(0, time.time())])
+
+   def fetch(self, startTime, endTime):
+      pass
