@@ -222,3 +222,5 @@ DATABASES = {
 # MIDDLEWARE_CLASSES or APPS
 #from graphite.app_settings import *
 
+# URL base for a Metricfire instance. (internalapi)
+MFURL = "http://localhost:8000/internalapi/graphite"

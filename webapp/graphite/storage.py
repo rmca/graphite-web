@@ -150,6 +150,6 @@ class FindQuery:
 finders = [
 #  CeresFinder(settings.CERES_DIR),
 #  StandardFinder(settings.STANDARD_DIRS),
-   MetricfireFinder()
+   MetricfireFinder(settings.MFURL)
 ]
 STORE = Store(finders, hosts=settings.CLUSTER_SERVERS)

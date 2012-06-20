@@ -7,10 +7,11 @@ from graphite.readers import WhisperReader, GzippedWhisperReader, RRDReader, Met
 from graphite.util import find_escaped_pattern_fields
 
 from graphite.logger import log
+import redis
+import httplib2
+import json
 
 #setDefaultSliceCachingBehavior('all')
-
-import redis
 
 class CeresFinder:
   def __init__(self, directory):
@@ -33,15 +34,20 @@ class CeresFinder:
         yield BranchNode(metric_path)
 
 class MetricfireFinder:
+   def __init__(self, mfurl):#, redishostport):
+      self._mfurl = mfurl
+      #self._redishostport = redishostport
+      #self._redis = redis.Redis(redishostport)
+
    def find_nodes(self, userid, query):
-      r = redis.Redis()
 
       if query.pattern.endswith(".*"):
          patternroot = query.pattern[:-1]
       else:
          patternroot = ""
 
-      metrics = [metric.split("/")[2] for metric in r.smembers("user_0_metrics")]
+      metrics = self._getMetrics(userid)
+      print "metrics", metrics
       
       for metric in match_entries(metrics, query.pattern):
          metric = metric[len(patternroot):]
@@ -52,6 +58,15 @@ class MetricfireFinder:
          else:
             yield BranchNode(levels[0])
 
+   def _getMetrics(self, userid):
+      conn = httplib2.Http()
+      resp, content = conn.request("%s/%s/metrics/" % (self._mfurl, userid))
+      print content
+      print resp
+      if resp['status'] == '200':
+         return json.loads(content)
+      else:
+         return []
 
 class StandardFinder:
   DATASOURCE_DELIMETER = '::RRD_DATASOURCE::'
