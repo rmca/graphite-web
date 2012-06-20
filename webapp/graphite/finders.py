@@ -33,7 +33,7 @@ class CeresFinder:
         yield BranchNode(metric_path)
 
 class MetricfireFinder:
-   def find_nodes(self, query):
+   def find_nodes(self, userid, query):
       r = redis.Redis()
 
       if query.pattern.endswith(".*"):

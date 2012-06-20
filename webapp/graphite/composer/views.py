@@ -31,7 +31,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 
-def composer(request):
+def composer(request, userid):
   profile = getProfile(request)
   context = {
     'queryString' : request.GET.urlencode().replace('+','%20'),

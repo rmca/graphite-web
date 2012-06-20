@@ -73,7 +73,7 @@ def search_view(request):
   return json_response_for(request, dict(metrics=results))
 
 
-def find_view(request):
+def find_view(request, userid):
   "View for finding metrics matching a given pattern"
   profile = getProfile(request)
   format = request.REQUEST.get('format', 'treejson')
@@ -112,7 +112,7 @@ def find_view(request):
       query = '.'.join(query_parts)
 
   try:
-    matches = list( STORE.find(query, fromTime, untilTime, local=local_only) )
+    matches = list( STORE.find(userid, query, fromTime, untilTime, local=local_only) )
   except:
     log.exception()
     raise
@@ -151,7 +151,7 @@ def find_view(request):
   return response
 
 
-def expand_view(request):
+def expand_view(request, userid):
   "View for expanding a pattern into matching metric paths"
   local_only    = int( request.REQUEST.get('local', 0) )
   group_by_expr = int( request.REQUEST.get('groupByExpr', 0) )
@@ -160,7 +160,7 @@ def expand_view(request):
   results = {}
   for query in request.REQUEST.getlist('query'):
     results[query] = set()
-    for node in STORE.find(query, local=local_only):
+    for node in STORE.find(userid, query, local=local_only):
       if node.is_leaf or not leaves_only:
         results[query].add( node.path )
 
