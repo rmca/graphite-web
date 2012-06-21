@@ -47,13 +47,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 
 
-def renderView(request, userid):
+def renderView(request, uid):
   start = time()
   (graphOptions, requestOptions) = parseOptions(request)
   useCache = 'noCache' not in requestOptions
   cacheTimeout = requestOptions['cacheTimeout']
   requestContext = {
-    'userid': userid,
+    'uid': uid,
     'startTime' : requestOptions['startTime'],
     'endTime' : requestOptions['endTime'],
     'localOnly' : requestOptions['localOnly'],

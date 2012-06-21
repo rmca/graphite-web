@@ -39,15 +39,14 @@ class MetricfireFinder:
       #self._redishostport = redishostport
       #self._redis = redis.Redis(redishostport)
 
-   def find_nodes(self, userid, query):
+   def find_nodes(self, uid, query):
 
       if query.pattern.endswith(".*"):
          patternroot = query.pattern[:-1]
       else:
          patternroot = ""
 
-      metrics = self._getMetrics(userid)
-      print "metrics", metrics
+      metrics = self._getMetrics(uid)
       
       for metric in match_entries(metrics, query.pattern):
          metric = metric[len(patternroot):]
@@ -58,11 +57,9 @@ class MetricfireFinder:
          else:
             yield BranchNode(levels[0])
 
-   def _getMetrics(self, userid):
+   def _getMetrics(self, uid):
       conn = httplib2.Http()
-      resp, content = conn.request("%s/%s/metrics/" % (self._mfurl, userid))
-      print content
-      print resp
+      resp, content = conn.request("%s/%s/metrics/" % (self._mfurl, uid))
       if resp['status'] == '200':
          return json.loads(content)
       else:
