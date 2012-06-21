@@ -5,6 +5,8 @@ from graphite.intervals import Interval, IntervalSet
 from graphite.carbonlink import CarbonLink
 from graphite.logger import log
 from django.conf import settings
+import httplib2
+import json
 
 try:
   import whisper
@@ -265,8 +267,24 @@ class RRDReader:
     return  retention_points * info['step']
 
 class MetricfireReader:
+   def __init__(self, mfurl, uid, metric):
+      self._mfurl = mfurl
+      self._uid = uid
+      self._metric = metric
+
    def get_intervals(self):
+      # TODO
       return IntervalSet([Interval(0, time.time())])
 
    def fetch(self, startTime, endTime):
-      pass
+
+      conn = httplib2.Http()
+      resp, content = conn.request("%s/%s/fetch/%s?start=%d&end=%d" % (self._mfurl, self._uid, self._metric, startTime, endTime))
+   
+      if resp['status'] == '200':
+         resolution, values = json.loads(content)
+      else:
+         values = []
+
+      return (startTime, endTime, resolution), values
+
