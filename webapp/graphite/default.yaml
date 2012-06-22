@@ -1,0 +1,14 @@
+APPNAME: graphite
+
+# URL base for a Metricfire instance. (internalapi)
+MFURL: http://localhost:8000/internalapi/graphite
+
+DATABASES:
+   default:
+      NAME: graphite
+      ENGINE: django.db.backends.mysql
+      USER: root
+      PASSWORD: ''
+      HOST: ''
+      PORT: ''
+

@@ -215,3 +215,38 @@ if USE_LDAP_AUTH:
 
 if SECRET_KEY == 'UNSAFE_DEFAULT':
   warn('SECRET_KEY is set to an unsafe default. This should be set in local_settings.py for better security')
+
+import yaml
+import os
+
+def loadConfig(path):
+   settings = globals()
+   config = yaml.load(open(path).read())
+   if config is not None:
+      settings.update(config)
+
+config_path = os.path.abspath(os.path.dirname(__file__))
+
+# Load the main config. This must exist in the same directory as this settings module.
+loadConfig(os.path.join(config_path, "default.yaml"))
+
+# Attempt to load the system-wide config, but it's OK if it doesn't exist.
+try:
+   loadConfig("/etc/django/%s.yaml" % APPNAME)
+except IOError, ex:
+   if ex.errno != 2: # Does not exist
+      raise
+
+# If being run by the django dev server, load the dev configs. It is OK if
+# they don't exist.
+if 'manage.py' in sys.argv:
+   try:
+      loadConfig(os.path.join(config_path, "dev.yaml"))
+      loadConfig(os.path.join(os.environ["HOME"], "%s.yaml" % APPNAME))
+   except IOError, ex:
+      if ex.errno != 2: # Does not exist
+         raise
+
+
+
+

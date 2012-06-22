@@ -144,16 +144,17 @@ LOG_DIR = "/tmp"
 #
 # Users with Django 1.2 or greater should use the new dictionary
 # specification as the old database specification style is removed in 1.4
-DATABASES = {
-    'default': {
-        'NAME': '/tmp/graphite.sqlite3',
-        'ENGINE': 'django.db.backends.sqlite3',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': ''
-    }
-}
+#DATABASES = {
+#    'default': {
+#        'NAME': '/tmp/graphite.sqlite3',
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'USER': '',
+#        'PASSWORD': '',
+#        'HOST': '',
+#        'PORT': ''
+#    }
+#}
+#
 #
 # Users still on Django 1.1 must use the old method instead:
 #DATABASE_ENGINE = 'django.db.backends.mysql'
@@ -222,5 +223,3 @@ DATABASES = {
 # MIDDLEWARE_CLASSES or APPS
 #from graphite.app_settings import *
 
-# URL base for a Metricfire instance. (internalapi)
-MFURL = "http://localhost:8000/internalapi/graphite"
