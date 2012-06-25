@@ -21,7 +21,7 @@ from warnings import warn
 
 GRAPHITE_WEB_APP_SETTINGS_LOADED = False
 WEBAPP_VERSION = '0.10.0-alpha'
-DEBUG = True
+DEBUG = False
 JAVASCRIPT_DEBUG = False
 
 # Filesystem layout
