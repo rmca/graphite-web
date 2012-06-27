@@ -42,20 +42,21 @@ class MetricfireFinder:
    def find_nodes(self, uid, query):
       if query.pattern.endswith(".*"):
          patternroot = query.pattern[:-1]
-      else:
+      elif query.pattern == "*":
          patternroot = ""
+      else:
+         patternroot = query.pattern
 
       metrics = self._getMetrics(uid)
       
       for metric in match_entries(metrics, query.pattern):
          metric_stripped = metric[len(patternroot):]
          levels = metric_stripped.split(".")
-         
-         if len(levels) > 1:
+
+         if len(levels) > 1 and query.pattern != metric:
             yield BranchNode(levels[0])
-            continue
-         
-         yield LeafNode(metric, MetricfireReader(self._mfurl, uid, metric))
+         else:
+            yield LeafNode(metric, MetricfireReader(self._mfurl, uid, metric))
 
    def _getMetrics(self, uid):
       conn = httplib2.Http()
