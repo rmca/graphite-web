@@ -53,8 +53,9 @@ class MetricfireFinder:
          
          if len(levels) > 1:
             yield BranchNode(levels[0])
-
-         yield LeafNode(levels[0], MetricfireReader(self._mfurl, uid, metric))
+            continue
+         
+         yield LeafNode(metric, MetricfireReader(self._mfurl, uid, metric))
 
    def _getMetrics(self, uid):
       conn = httplib2.Http()
