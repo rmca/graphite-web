@@ -30,7 +30,7 @@ except ImportError:
   import pickle
 
 
-def header(request, uid):
+def header(request):
   "View for the header frame of the browser UI"
   context = {}
   context['user'] = request.user

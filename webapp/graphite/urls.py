@@ -20,19 +20,22 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
   ('^admin/', include(admin.site.urls)),
-  ('^(?P<uid>[a-z0-9]{8})/graphite/render/?', include('graphite.render.urls')),
+  ('^[a-z0-9]{8}/graphite/render/?', include('graphite.render.urls')),
   ('^cli/?', include('graphite.cli.urls')),
-  ('^(?P<uid>[a-z0-9]{8})/graphite/composer/?', include('graphite.composer.urls')),
+  ('^[a-z0-9]{8}/graphite/composer/?', include('graphite.composer.urls')),
   ('^(?P<uid>[a-z0-9]{8})/graphite/metrics/?', include('graphite.metrics.urls')),
-  ('^(?P<uid>[a-z0-9]{8})/graphite/browser/?', include('graphite.browser.urls')),
+  ('^[a-z0-9]{8}/graphite/browser/?', include('graphite.browser.urls')),
   ('^account/?', include('graphite.account.urls')),
   ('^dashboard/?', include('graphite.dashboard.urls')),
   ('^whitelist/?', include('graphite.whitelist.urls')),
   ('^graphitecontent/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : settings.CONTENT_DIR}),
+
   ('graphlot/', include('graphite.graphlot.urls')),
   ('^version/', include('graphite.version.urls')),
   ('^events/', include('graphite.events.urls')),
   ('', 'graphite.browser.views.browser')
 )
+
+#http://localhost:8000/50deaf12/graphite/content/img/save.gif
 
 handler500 = 'graphite.views.server_error'

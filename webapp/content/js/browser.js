@@ -95,7 +95,8 @@ function createTreePanel(){
       listeners: {beforeload: setParams}
     })
   });
-  rootNode.appendChild(userGraphsNode);
+  //DC - Don't want to load *every* user's graph.
+  //rootNode.appendChild(userGraphsNode);
 
   var treePanel = new Ext.tree.TreePanel({
     title: "Tree",

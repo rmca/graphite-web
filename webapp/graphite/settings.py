@@ -91,7 +91,7 @@ LDAP_USER_QUERY = "" # "(username=%s)"  For Active Directory use "(sAMAccountNam
 LDAP_URI = None
 
 #Set this to True to delegate authentication to the web server
-USE_REMOTE_USER_AUTHENTICATION = False
+USE_REMOTE_USER_AUTHENTICATION = True
 
 # Django 1.5 requires this so we set a default but warn the user
 SECRET_KEY = 'UNSAFE_DEFAULT'
@@ -131,6 +131,14 @@ else:
       'PORT': ''
   }
 }
+
+
+#DATABASE_ENGINE= 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+#DATABASE_NAME ='hostedgraphite'             # Or path to database file if using sqlite3.
+#DATABASE_USER= 'hostedgraphite'            # Not used with sqlite3.
+#DATABASE_PASSWORD='7-bVYNfboccD'         # Not used with sqlite3.
+#DATABASE_HOST=''             # Set to empty string for localhost. Not used with sqlite3.
+#DATABASE_PORT=''             # Set to empty string for default. Not used with sqlite3.
 
 # If using rrdcached, set to the address or socket of the daemon
 FLUSHRRDCACHED = ''
@@ -209,6 +217,7 @@ if USE_LDAP_AUTH and LDAP_URI is None:
 if USE_REMOTE_USER_AUTHENTICATION:
   MIDDLEWARE_CLASSES += ('django.contrib.auth.middleware.RemoteUserMiddleware',)
   AUTHENTICATION_BACKENDS.insert(0,'django.contrib.auth.backends.RemoteUserBackend')
+  MIDDLEWARE_CLASSES += ('graphite.hostedgraphite_middleware.HostedGraphiteMiddleware',)
 
 if USE_LDAP_AUTH:
   AUTHENTICATION_BACKENDS.insert(0,'graphite.account.ldapBackend.LDAPBackend')

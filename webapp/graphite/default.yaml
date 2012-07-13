@@ -5,10 +5,10 @@ MFURL: http://localhost:8000/internalapi/graphite
 
 DATABASES:
    default:
-      NAME: graphite
+      NAME: hostedgraphite
       ENGINE: django.db.backends.mysql
-      USER: graphite
-      PASSWORD: 'ahfuckitanyway'
+      USER: hostedgraphite
+      PASSWORD: '7-bVYNfboccD'
       HOST: ''
       PORT: ''
 
