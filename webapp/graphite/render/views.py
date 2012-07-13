@@ -52,7 +52,6 @@ def renderView(request):
   (graphOptions, requestOptions) = parseOptions(request)
   useCache = 'noCache' not in requestOptions
   cacheTimeout = requestOptions['cacheTimeout']
-  print "User uid: '%s'" % request.user.uid
   requestContext = {
     'uid': request.user.uid,
     'startTime' : requestOptions['startTime'],
