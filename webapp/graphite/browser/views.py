@@ -160,11 +160,14 @@ def userGraphLookup(request):
   user = request.GET.get('user')
   path = request.GET['path']
 
+  print "User: '%s'" % user
   if user:
     username = user
     graphPath = path[len(username)+1:]
+
   elif '.' in path:
     username, graphPath = path.split('.', 1)
+
   else:
     username, graphPath = path, None
 
@@ -183,8 +186,11 @@ def userGraphLookup(request):
 
   try:
 
+    # Pull the username from whomever is logged in.
+    username = request.user.username
+
     if not username:
-      profiles = Profile.objects.exclude(user=defaultUser)
+      profiles = Profile.objects.get(user=request.user)
 
       for profile in profiles:
         if profile.mygraph_set.count():
