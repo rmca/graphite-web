@@ -990,7 +990,7 @@ function importGraphUrl(targetUrl, options) {
   }
   params['target'] = graphTargetList;
 
-  if (graphTargetList.length == 0) {
+  if (!graphTargetList || graphTargetList.length == 0) {
     return;
   }
  
@@ -1385,7 +1385,7 @@ function newFromSavedGraph() {
     expandable: true,
     allowDrag: false,
     loader: new Ext.tree.TreeLoader({
-      url: "../browser/usergraph/",
+      url: "/browser/usergraph/",
       requestMethod: "GET",
       listeners: {beforeload: setParams}
     })
