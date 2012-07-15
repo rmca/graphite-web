@@ -73,8 +73,13 @@ def search_view(request):
   return json_response_for(request, dict(metrics=results))
 
 
-def find_view(request, uid):
+def find_view(request):
+
+
   "View for finding metrics matching a given pattern"
+
+  uid = request.user.uid
+
   profile = getProfile(request)
   format = request.REQUEST.get('format', 'treejson')
   local_only = int( request.REQUEST.get('local', 0) )
@@ -151,8 +156,11 @@ def find_view(request, uid):
   return response
 
 
-def expand_view(request, uid):
+def expand_view(request):
   "View for expanding a pattern into matching metric paths"
+
+  uid = request.user.uid
+
   local_only    = int( request.REQUEST.get('local', 0) )
   group_by_expr = int( request.REQUEST.get('groupByExpr', 0) )
   leaves_only   = int( request.REQUEST.get('leavesOnly', 0) )

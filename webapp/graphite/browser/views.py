@@ -160,7 +160,6 @@ def userGraphLookup(request):
   user = request.GET.get('user')
   path = request.GET['path']
 
-  print "User: '%s'" % user
   if user:
     username = user
     graphPath = path[len(username)+1:]

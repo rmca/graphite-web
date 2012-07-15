@@ -20,7 +20,7 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
   ('^admin/', include(admin.site.urls)),
-  ('^[a-z0-9]{8}/graphite/render/?', include('graphite.render.urls')),
+  ('^/graphite/render/?', include('graphite.render.urls')),
   ('^cli/?', include('graphite.cli.urls')),
   ('^[a-z0-9]{8}/graphite/composer/?', include('graphite.composer.urls')),
   ('^(?P<uid>[a-z0-9]{8})/graphite/metrics/?', include('graphite.metrics.urls')),
@@ -35,7 +35,5 @@ urlpatterns = patterns('',
   ('^events/', include('graphite.events.urls')),
   ('', 'graphite.browser.views.browser')
 )
-
-#http://localhost:8000/50deaf12/graphite/content/img/save.gif
 
 handler500 = 'graphite.views.server_error'
