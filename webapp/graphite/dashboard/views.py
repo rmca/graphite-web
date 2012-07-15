@@ -214,7 +214,7 @@ def find(request):
   results = []
 
   # Find all dashboard names that contain each of our query terms as a substring
-  for dashboard in Dashboard.objects.all():
+  for dashboard in Dashboard.objects.filter(owners__user=request.user):
     name = dashboard.name.lower()
     if name.startswith('temporary-'):
       continue
