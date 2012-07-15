@@ -69,7 +69,7 @@ var ContextFieldValueRecord = Ext.data.Record.create([
 ]);
 
 var contextFieldStore = new Ext.data.JsonStore({
-  url: '../metrics/find/',
+  url: 'metrics/find/',
   root: 'metrics',
   idProperty: 'name',
   fields: ContextFieldValueRecord,
@@ -299,7 +299,7 @@ function initDashboard () {
       }),
       store: new Ext.data.JsonStore({
         method: 'GET',
-        url: '../metrics/find/',
+        url: 'metrics/find/',
         autoLoad: true,
         baseParams: {
           query: '',
@@ -893,7 +893,7 @@ function metricTreeSelectorShow(pattern) {
   }
 
   var loader = new Ext.tree.TreeLoader({
-    url: '../metrics/find/',
+    url: 'metrics/find/',
     requestMethod: 'GET',
     listeners: {beforeload: setParams}
   });
@@ -967,7 +967,7 @@ function graphAreaToggle(target, options) {
     var record = new GraphRecord({
       target: graphTargetString,
       params: myParams,
-      url: '../render/?' + Ext.urlEncode(urlParams)
+      url: 'render/?' + Ext.urlEncode(urlParams)
     });
     graphStore.add([record]);
     updateGraphRecords();
@@ -1010,7 +1010,7 @@ function importGraphUrl(targetUrl, options) {
     var record = new GraphRecord({
       target: graphTargetString,
       params: params,
-      url: '../render/?' + Ext.urlEncode(urlParams)
+      url: 'render/?' + Ext.urlEncode(urlParams)
       });
       graphStore.add([record]);
       updateGraphRecords();
@@ -1977,7 +1977,7 @@ function breakoutGraph(record) {
   }
 
   Ext.Ajax.request({
-    url: '../metrics/expand/',
+    url: 'metrics/expand/',
     params: {
       groupByExpr: '1',
       leavesOnly: '1',
@@ -2048,7 +2048,7 @@ function mailGraph(record) {
          handler: function(){
            if(contactForm.getForm().isValid()){
              contactForm.getForm().submit({
-               url: '../dashboard/email',
+               url: 'dashboard/email',
                waitMsg: 'Processing Request',
                success: function (contactForm, response) {
          console.log(response.result);
