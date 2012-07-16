@@ -7,6 +7,7 @@ from graphite.logger import log
 from django.conf import settings
 import httplib2
 import json
+import logging
 
 try:
   import whisper
@@ -284,6 +285,8 @@ class MetricfireReader:
       if resp['status'] == '200':
          resolution, values = json.loads(content)
       else:
+         logging.error("Metric data fetch failed, got http %s, expected 200" % resp['status'])
+         resolution = 60 # TODO choose a sane value here? does it matter?
          values = []
 
       return (startTime, endTime, resolution), values
