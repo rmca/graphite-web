@@ -142,7 +142,7 @@ def dashboard(request, name=None):
 
   if name is not None:
     try:
-      dashboard = Dashboard.objects.get(name=name)
+      dashboard = Dashboard.objects.get(name=name, owners__user=request.user)
     except Dashboard.DoesNotExist:
       context['initialError'] = "Dashboard '%s' does not exist." % name
     else:
@@ -175,20 +175,32 @@ def save(request, name):
   # Deserialize and reserialize as a validation step
   state = str( json.dumps( json.loads( request.POST['state'] ) ) )
 
+
   try:
-    dashboard = Dashboard.objects.get(name=name)
+    # Find a dashboard by this name for the user who owns it.
+    dashboard = Dashboard.objects.get(name=name, owners__user=request.user)
+
   except Dashboard.DoesNotExist:
-    dashboard = Dashboard.objects.create(name=name, state=state)
+    # Save a dashboard with the correct owner information.
+    profile = getProfile(request,allowDefault=False)
+    dashboard = Dashboard()
+    dashboard.name=name
+    dashboard.state=state
+    dashboard.save()
+    dashboard.owners.add(profile)
+    dashboard.save()
+
+
   else:
     dashboard.state = state
-    dashboard.save();
+    dashboard.save()
 
   return json_response( dict(success=True) )
 
 
 def load(request, name):
   try:
-    dashboard = Dashboard.objects.get(name=name)
+    dashboard = Dashboard.objects.get(name=name, owners__user=request.user)
   except Dashboard.DoesNotExist:
     return json_response( dict(error="Dashboard '%s' does not exist. " % name) )
 
@@ -200,7 +212,7 @@ def delete(request, name):
     return json_response( dict(error="Must be logged in with appropriate permissions to delete") )
 
   try:
-    dashboard = Dashboard.objects.get(name=name)
+    dashboard = Dashboard.objects.get(name=name, owners__user=request.user)
   except Dashboard.DoesNotExist:
     return json_response( dict(error="Dashboard '%s' does not exist. " % name) )
   else:
@@ -269,7 +281,7 @@ def create_temporary(request):
   while True:
     name = "temporary-%d" % i
     try:
-      Dashboard.objects.get(name=name)
+      Dashboard.objects.get(name=name, owners__user=request.user)
     except Dashboard.DoesNotExist:
       dashboard = Dashboard.objects.create(name=name, state=state)
       break
