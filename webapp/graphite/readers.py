@@ -268,10 +268,11 @@ class RRDReader:
     return  retention_points * info['step']
 
 class MetricfireReader:
-   def __init__(self, mfurl, uid, metric):
+   def __init__(self, mfurl, uid, metric, view = 'avg'):
       self._mfurl = mfurl
       self._uid = uid
       self._metric = metric
+      self._view = view
 
    def get_intervals(self):
       # TODO
@@ -280,7 +281,7 @@ class MetricfireReader:
    def fetch(self, startTime, endTime):
 
       conn = httplib2.Http()
-      resp, content = conn.request("%s/%s/fetch/%s?start=%d&end=%d" % (self._mfurl, self._uid, self._metric, startTime, endTime))
+      resp, content = conn.request("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view))
    
       if resp['status'] == '200':
          resolution, values = json.loads(content)

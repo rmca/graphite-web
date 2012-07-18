@@ -40,23 +40,31 @@ class MetricfireFinder:
       #self._redis = redis.Redis(redishostport)
 
    def find_nodes(self, uid, query):
-      if query.pattern.endswith(".*"):
-         patternroot = query.pattern[:-1]
-      elif query.pattern == "*":
+      pattern = query.pattern
+      if ':' in pattern:
+         pattern, view = pattern.split(":", 1)
+         suffix = ':' + view
+      else:
+         view = None
+         suffix = ""
+      
+      if pattern.endswith(".*"):
+         patternroot = pattern[:-1]
+      elif pattern == "*":
          patternroot = ""
       else:
-         patternroot = query.pattern
+         patternroot = pattern
 
       metrics = self._getMetrics(uid)
       
-      for metric in match_entries(metrics, query.pattern):
+      for metric in match_entries(metrics, pattern):
          metric_stripped = metric[len(patternroot):]
          levels = metric_stripped.split(".")
 
          if len(levels) > 1 and query.pattern != metric:
             yield BranchNode(levels[0])
          else:
-            yield LeafNode(metric, MetricfireReader(self._mfurl, uid, metric))
+            yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
 
    def _getMetrics(self, uid):
       conn = httplib2.Http()
