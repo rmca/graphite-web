@@ -68,7 +68,7 @@ class MetricfireFinder:
             if len(levels) == 1:
                yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
             else:
-               yield BranchNode(levels[0])
+               yield BranchNode(patternroot + levels[0])
       
       # Not doing a search, want a specific leaf node.
       else:
