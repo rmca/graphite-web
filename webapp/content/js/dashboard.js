@@ -1130,6 +1130,7 @@ function updateTimeText() {
 }
 
 function timeRangeUpdated() {
+
   if (TimeRange.type == 'relative') {
     var fromParam = '-' + TimeRange.relativeStartQuantity + TimeRange.relativeStartUnits;
     if (TimeRange.relativeUntilUnits == 'now') {
