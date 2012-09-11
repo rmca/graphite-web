@@ -48,22 +48,31 @@ class MetricfireFinder:
          view = None
          suffix = ""
       
-      if pattern.endswith(".*"):
-         patternroot = pattern[:-1]
-      elif pattern == "*":
-         patternroot = ""
-      else:
-         patternroot = pattern
-
       metrics = self._getMetrics(uid)
-      
-      for metric in match_entries(metrics, pattern):
-         metric_stripped = metric[len(patternroot):]
-         levels = metric_stripped.split(".")
 
-         if len(levels) > 1 and query.pattern != metric:
-            yield BranchNode(levels[0])
-         else:
+      # Initial listing, first level only.
+      if pattern == "*":
+         for metric in metrics:
+            levels = metric.split(".")
+            if len(levels) == 1:
+               yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
+            else:
+               yield BranchNode(levels[0])
+
+      # Searching one level down.
+      elif pattern.endswith(".*"):
+         patternroot = pattern[:-1]
+         for metric in match_entries(metrics, pattern):
+            partialmetric = metric[len(patternroot):]
+            levels = partialmetric.split(".")
+            if len(levels) == 1:
+               yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
+            else:
+               yield BranchNode(levels[0])
+      
+      # Not doing a search, want a specific leaf node.
+      else:
+         for metric in match_entries(metrics, pattern):
             yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
 
    def _getMetrics(self, uid):
