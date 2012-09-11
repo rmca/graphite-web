@@ -1115,7 +1115,7 @@ var TimeRange = {
 function getTimeText() {
   if (TimeRange.type == 'relative') {
     var text = "Now showing the past " + TimeRange.relativeStartQuantity + " " + TimeRange.relativeStartUnits;
-    if (TimeRange.relativeUntilUnits !== 'now' && TimeRange.relativeUntilUnits !== '') {
+    if (TimeRange.relativeUntilUnits !== 'now' && TimeRange.relativeUntilQuantity !== '') {
       text = text + " until " + TimeRange.relativeUntilQuantity + " " + TimeRange.relativeUntilUnits + " ago";
     }
     return text;
