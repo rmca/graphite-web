@@ -18,7 +18,13 @@ from django.contrib import admin
 
 admin.autodiscover()
 
+
+UUID_PATTERN = '[\w\d]{8}-[\w\d]{4}-[\w\d]{4}-[\w\d]{4}-[\w\d]{12}'
+
 urlpatterns = patterns('',
+
+  ('^[a-z0-9]{8}/%s/graphite/content/(?P<path>.*)$' % UUID_PATTERN, 'django.views.static.serve', {'document_root' : settings.CONTENT_DIR}),
+  ('^[a-z0-9]{8}/graphite/content/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : settings.CONTENT_DIR}),
   ('^admin/', include(admin.site.urls)),
   ('^[a-z0-9]{8}/graphite/render/?', include('graphite.render.urls')),
   ('^cli/?', include('graphite.cli.urls')),
@@ -29,9 +35,10 @@ urlpatterns = patterns('',
   ('^[a-z0-9]{8}/graphite/dashboard/?', include('graphite.dashboard.urls')),
   ('^whitelist/?', include('graphite.whitelist.urls')),
   ('^graphitecontent/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : settings.CONTENT_DIR}),
-  ('^[a-z0-9]{8}/graphite/graphlot/', include('graphite.graphlot.urls')),
-  ('^[a-z0-9]{8}/graphite/version/', include('graphite.version.urls')),
-  ('^[a-z0-9]{8}/graphite/events/',  include('graphite.events.urls')),
+  ('^[a-z0-9]{8}/%s/graphite/graphlot/' % UUID_PATTERN, include('graphite.graphlot.urls')),
+  ('^[a-z0-9]{8}/graphite/graphlot/',                   include('graphite.graphlot.urls')),
+  ('^[a-z0-9]{8}/graphite/version/',                    include('graphite.version.urls')),
+  ('^[a-z0-9]{8}/graphite/events/',                     include('graphite.events.urls')),
   ('', 'graphite.browser.views.browser')
 )
 
