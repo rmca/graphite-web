@@ -49,7 +49,7 @@ urlpatterns = patterns('',
   ('^[a-z0-9]{8}/graphite/events/',                     include('graphite.events.urls')),
 
   # Ban uuid access to non-read-only parts of graphite
-  ('^[a-z0-9]{8}/%s/graphite/[cli|admin|composer|metrics|browser|account|dashboard|version|events]?/?' % UUID_PATTERN, forbidden),
+  ('^[a-z0-9]{8}/%s/graphite/?.*?/?' % UUID_PATTERN, forbidden),
 
   ('', 'graphite.browser.views.browser')
 )
