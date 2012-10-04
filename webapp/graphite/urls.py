@@ -15,11 +15,18 @@ limitations under the License."""
 from django.conf.urls import *
 from django.conf import settings
 from django.contrib import admin
+from django.http import HttpResponseForbidden
+from django.views.generic.simple import redirect_to
 
 admin.autodiscover()
 
 
 UUID_PATTERN = '[\w\d]{8}-[\w\d]{4}-[\w\d]{4}-[\w\d]{4}-[\w\d]{12}'
+
+
+def forbidden(request):
+   return HttpResponseForbidden()
+
 
 urlpatterns = patterns('',
 
@@ -40,6 +47,10 @@ urlpatterns = patterns('',
   ('^[a-z0-9]{8}/graphite/graphlot/',                   include('graphite.graphlot.urls')),
   ('^[a-z0-9]{8}/graphite/version/',                    include('graphite.version.urls')),
   ('^[a-z0-9]{8}/graphite/events/',                     include('graphite.events.urls')),
+
+  # Ban uuid access to non-read-only parts of graphite
+  ('^[a-z0-9]{8}/%s/graphite/[cli|admin|composer|metrics|browser|account|dashboard|version|events]?/?' % UUID_PATTERN, forbidden),
+
   ('', 'graphite.browser.views.browser')
 )
 
