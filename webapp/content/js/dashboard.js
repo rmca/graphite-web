@@ -12,6 +12,7 @@ var graphStore;
 var graphView;
 var navBar;
 var dashboardName;
+var dashboardSlug;
 var dashboardURL;
 var refreshTask;
 var spacer;
@@ -2335,9 +2336,10 @@ function saveDashboard() {
 
 function sendSaveRequest(name) {
   Ext.Ajax.request({
-    url: "dashboard/save/" + name,
+    url: "../dashboard/save/",
     method: 'POST',
     params: {
+      name : name,
       state: Ext.encode( getState() )
     },
     success: function (response) {
@@ -2451,6 +2453,13 @@ function deleteDashboard(name) {
   });
 }
 
+function slugify(text) {
+	text = text.replace(/[^-a-zA-Z0-9,&\s]+/ig, '');
+	text = text.replace(/-/gi, "_");
+	text = text.replace(/\s/gi, "-");
+	return text.toLowerCase();
+}
+
 function setDashboardName(name) {
   dashboardName = name;
   var saveButton = Ext.getCmp('dashboard-save-button');
@@ -2461,7 +2470,9 @@ function setDashboardName(name) {
     navBar.setTitle("untitled");
     saveButton.setText("Save");
     saveButton.disable();
+
   } else {
+
     var urlparts = location.href.split('#')[0].split('/');
     var i = urlparts.indexOf('dashboard');
     if (i == -1) {
@@ -2469,11 +2480,11 @@ function setDashboardName(name) {
       return;
     }
     urlparts = urlparts.slice(0, i+1);
-    urlparts.push( encodeURI(name) )
+    urlparts.push( slugify(name) );
     dashboardURL = urlparts.join('/');
 
     document.title = name + " - Graphite Dashboard";
-    window.location.hash = name;
+    window.location.hash = slugify(name);
     navBar.setTitle(name + " - (" + dashboardURL + ")");
     saveButton.setText('Save "' + name + '"');
     saveButton.enable();
@@ -2564,7 +2575,7 @@ function showDashboardFinder() {
     method: 'GET',
     params: {query: "e"},
     fields: [{
-      name: 'name',
+      name: ['name', 'slug'],
       sortType: function(value) {
 	// Make sorting case-insensitive
         return value.toLowerCase();
@@ -2585,7 +2596,7 @@ function showDashboardFinder() {
   function openSelected() {
     var selected = dashboardsList.getSelectedRecords();
     if (selected.length > 0) {
-      sendLoadRequest(selected[0].data.name);
+      sendLoadRequest(selected[0].data.slug);
     }
     win.close();
   }
@@ -2634,7 +2645,7 @@ function showDashboardFinder() {
 
       dblclick: function (listView, index, node, e) {
                   var record = dashboardsStore.getAt(index);
-                  sendLoadRequest(record.data.name);
+                  sendLoadRequest(record.data.slug);
                   win.close();
                 }
     },

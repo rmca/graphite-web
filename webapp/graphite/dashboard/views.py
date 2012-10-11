@@ -5,9 +5,10 @@ from os.path import getmtime, join, exists
 from urllib import urlencode
 from ConfigParser import ConfigParser
 from django.shortcuts import render_to_response
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, QueryDict, HttpResponseRedirect
 from django.conf import settings
 from django.contrib.auth import login, authenticate, logout
+from django.template.defaultfilters import slugify
 from graphite.util import json, getProfile
 from graphite.dashboard.models import Dashboard
 from graphite.render.views import renderView
@@ -104,7 +105,7 @@ class DashboardConfig:
 config = DashboardConfig()
 
 
-def dashboard(request, name=None):
+def dashboard(request, slug=None):
   dashboard_conf_missing = False
 
   try:
@@ -140,11 +141,11 @@ def dashboard(request, name=None):
   if user:
       context['userName'] = user.username
 
-  if name is not None:
+  if slug is not None:
     try:
-      dashboard = Dashboard.objects.get(name=name, owners__user=request.user)
+      dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
     except Dashboard.DoesNotExist:
-      context['initialError'] = "Dashboard '%s' does not exist." % name
+      context['initialError'] = "Dashboard '%s' does not exist." % slug
     else:
       context['initialState'] = dashboard.state
 
@@ -174,11 +175,12 @@ def save(request, name):
     return json_response( dict(error="Must be logged in with appropriate permissions to save") )
   # Deserialize and reserialize as a validation step
   state = str( json.dumps( json.loads( request.POST['state'] ) ) )
-
+  name = request.POST['name']
+  slug = slugify(name)
 
   try:
     # Find a dashboard by this name for the user who owns it.
-    dashboard = Dashboard.objects.get(name=name, owners__user=request.user)
+    dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
 
   except Dashboard.DoesNotExist:
     # Save a dashboard with the correct owner information.
@@ -186,6 +188,7 @@ def save(request, name):
     dashboard = Dashboard()
     dashboard.name=name
     dashboard.state=state
+    dashboard.slug = slug
     dashboard.save()
     dashboard.owners.add(profile)
     dashboard.save()
@@ -195,16 +198,16 @@ def save(request, name):
     dashboard.state = state
     dashboard.save()
 
-  return json_response( dict(success=True) )
+  return json_response( dict(success=True, slug=slug) )
 
 
-def load(request, name):
+def load(request, slug):
   try:
-    dashboard = Dashboard.objects.get(name=name, owners__user=request.user)
+    dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
   except Dashboard.DoesNotExist:
-    return json_response( dict(error="Dashboard '%s' does not exist. " % name) )
+    return json_response( dict(error="Dashboard '%s' does not exist. " % slug) )
 
-  return json_response( dict(state=json.loads(dashboard.state)) )
+  return json_response( dict(state=json.loads(dashboard.state), slug=dashboard.slug) )
 
 
 def delete(request, name):
@@ -240,7 +243,7 @@ def find(request):
         break
 
     if found:
-      results.append( dict(name=dashboard.name) )
+      results.append( dict(name=dashboard.name, slug=dashboard.slug) )
 
   return json_response( dict(dashboards=results) )
 
@@ -283,12 +286,12 @@ def create_temporary(request):
     try:
       Dashboard.objects.get(name=name, owners__user=request.user)
     except Dashboard.DoesNotExist:
-      dashboard = Dashboard.objects.create(name=name, state=state)
+      dashboard = Dashboard.objects.create(name=name, slug=slugify(name), state=state)
       break
     else:
       i += 1
 
-  return json_response( dict(name=dashboard.name) )
+  return json_response( dict(name=dashboard.name, slug=dashboard.slug) )
 
 
 def json_response(obj):
