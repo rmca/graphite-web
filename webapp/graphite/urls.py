@@ -45,8 +45,8 @@ urlpatterns = patterns('',
   ('^graphitecontent/(?P<path>.*)$', 'django.views.static.serve', {'document_root' : settings.CONTENT_DIR}),
   ('^[a-z0-9]{8}/%s/graphite/graphlot/' % UUID_PATTERN, include('graphite.graphlot.urls')),
   ('^[a-z0-9]{8}/graphite/graphlot/',                   include('graphite.graphlot.urls')),
-  ('^[a-z0-9]{8}/graphite/version/',                    include('graphite.version.urls')),
-  ('^[a-z0-9]{8}/graphite/events/',                     include('graphite.events.urls')),
+  #('^[a-z0-9]{8}/graphite/version/',                    include('graphite.version.urls')),
+  #('^[a-z0-9]{8}/graphite/events/',                     include('graphite.events.urls')),
 
   # Ban uuid access to non-read-only parts of graphite
   ('^[a-z0-9]{8}/%s/graphite/?.*?/?' % UUID_PATTERN, forbidden),
