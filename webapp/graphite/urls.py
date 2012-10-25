@@ -40,7 +40,11 @@ urlpatterns = patterns('',
   ('^[a-z0-9]{8}/graphite/metrics/',   include('graphite.metrics.urls')),
   ('^[a-z0-9]{8}/graphite/browser/',   include('graphite.browser.urls')),
   ('^[a-z0-9]{8}/graphite/account/',   include('graphite.account.urls')),
-  ('^[a-z0-9]{8}/%s/graphite/dashboard/load/$' % UUID_PATTERN, 'graphite.dashboard.views.load'),
+
+  ('^[a-z0-9]{8}/%s/graphite/dashboard/load/(?P<slug>[^/]+)?' % UUID_PATTERN, 'graphite.dashboard.views.load'),
+  ('^[a-z0-9]{8}/%s/graphite/dashboard/find/$' % UUID_PATTERN, 'graphite.dashboard.views.find'),
+  ('^[a-z0-9]{8}/%s/graphite/dashboard/$'       % UUID_PATTERN, 'graphite.dashboard.views.dashboard'),
+
   ('^[a-z0-9]{8}/graphite/dashboard/', include('graphite.dashboard.urls')),
 
   ('^whitelist/', include('graphite.whitelist.urls')),
