@@ -970,7 +970,7 @@ function graphAreaToggle(target, options) {
     var record = new GraphRecord({
       target: graphTargetString,
       params: myParams,
-      url: 'render/?' + Ext.urlEncode(urlParams)
+      url: '/render/?' + Ext.urlEncode(urlParams)
     });
     graphStore.add([record]);
     updateGraphRecords();
@@ -1013,7 +1013,7 @@ function importGraphUrl(targetUrl, options) {
     var record = new GraphRecord({
       target: graphTargetString,
       params: params,
-      url: 'render/?' + Ext.urlEncode(urlParams)
+      url: '/render/?' + Ext.urlEncode(urlParams)
       });
       graphStore.add([record]);
       updateGraphRecords();
@@ -1033,6 +1033,7 @@ function updateGraphRecords() {
     if (!params.uniq === undefined) {
         delete params["uniq"];
     }
+    // DC - This is the url that is pulled on the dash, not the one stored.
     item.set('url', 'render/?' + Ext.urlEncode(params));
     item.set('width', GraphSize.width);
     item.set('height', GraphSize.height);
