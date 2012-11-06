@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login
+from django.core.exceptions import ImproperlyConfigured
 
 class HostedGraphiteMiddleware(object):
 
@@ -12,7 +13,7 @@ class HostedGraphiteMiddleware(object):
          remote_user, uid = request.META['HTTP_REMOTE_USER'].split("/")
          user = authenticate(remote_user=remote_user)
          user.uid = uid
-         login(request, user)
+         request.user = user
 
       return None
 
