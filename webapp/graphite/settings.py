@@ -248,7 +248,7 @@ except IOError, ex:
 
 # If being run by the django dev server, load the dev configs. It is OK if
 # they don't exist.
-if 'manage.py' in sys.argv:
+if 'manage.py' in sys.argv and os.environ.get('DJANGOCONFIG', None) != "prod":
    try:
       loadConfig(os.path.join(config_path, "dev.yaml"))
       loadConfig(os.path.join(os.environ["HOME"], "%s.yaml" % APPNAME))
