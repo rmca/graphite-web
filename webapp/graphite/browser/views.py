@@ -44,12 +44,16 @@ def browser(request):
   "View for the top-level frame of the browser UI"
   context = {
     'queryString' : request.GET.urlencode(),
-    'target' : request.GET.get('target')
+    'target' : request.GET.get('target'),
+    'user'   : request.user
   }
+
   if context['queryString']:
     context['queryString'] = context['queryString'].replace('#','%23')
+
   if context['target']:
     context['target'] = context['target'].replace('#','%23') #js libs terminate a querystring on #
+
   return render_to_response("browser.html", context) 
 
 
