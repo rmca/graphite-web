@@ -558,16 +558,6 @@ function initDashboard () {
         }, {
           text: "Edit Dashboard",
           handler: editDashboard
-        }, {
-          id: "dashboard-login-button",
-          text: getLoginMenuItemText(),
-          handler: function (item, e) {
-                     if (isLoggedIn()) {
-                       logout();
-                     } else {
-                       showLoginForm();
-                     }
-                   }
         }
       ]
     }
@@ -970,7 +960,7 @@ function graphAreaToggle(target, options) {
     var record = new GraphRecord({
       target: graphTargetString,
       params: myParams,
-      url: '../render/?' + Ext.urlEncode(urlParams)
+      url: '/render/?' + Ext.urlEncode(urlParams)
     });
     graphStore.add([record]);
     updateGraphRecords();
@@ -2244,7 +2234,6 @@ for (var event_name in UI_CONFIG.keyboard_shortcuts) {
 }
 
 var keyMap = new Ext.KeyMap(document, keyMapConfigs);
-
 
 /* Dashboard functions */
 function editDashboard() {
