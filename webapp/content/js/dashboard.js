@@ -734,7 +734,7 @@ function initDashboard () {
   if (initialState) {
     applyState(initialState);
   }
-  
+
   // Always collapse the nav bar.
   navBar.collapse();
 
@@ -986,7 +986,7 @@ function importGraphUrl(targetUrl, options) {
   if (!graphTargetList || graphTargetList.length == 0) {
     return;
   }
- 
+
   var graphTargetString = Ext.urlEncode({target: graphTargetList});
   var existingIndex = graphStore.findExact('target', graphTargetString);
 
@@ -2279,7 +2279,7 @@ function editDashboard() {
       var record = new GraphRecord({
         target: targets[i].target,
         params: myParams,
-        url: '/render?' + Ext.urlEncode(urlParams)
+        url: '../render/?' + Ext.urlEncode(urlParams)
       });
       graphStore.add([record]);
     }
