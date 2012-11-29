@@ -2,7 +2,7 @@ DEBUG: true
 
 DATABASES:
    default:
-      NAME: graphite
+      NAME: hostedgraphite
       ENGINE: django.db.backends.mysql
       USER: root
       PASSWORD: ''
