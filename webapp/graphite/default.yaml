@@ -3,6 +3,8 @@ APPNAME: graphite
 # URL base for a Metricfire instance. (internalapi)
 MFURL: http://localhost:8000/internalapi/graphite
 
+MEMCACHE_HOSTS: ['127.0.0.1:11211']
+
 DATABASES:
    default:
       NAME: hostedgraphite
