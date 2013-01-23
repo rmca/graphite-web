@@ -78,8 +78,9 @@ class MetricfireFinder:
    def _getMetrics(self, uid):
       conn = httplib2.Http()
       resp, content = conn.request("%s/%s/metrics/" % (self._mfurl, uid))
+      content = json.loads(content)
       if resp['status'] == '200':
-         return json.loads(content)
+         return content['metrics']
       else:
          return []
 
