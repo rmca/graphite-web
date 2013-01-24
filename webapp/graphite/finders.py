@@ -10,6 +10,7 @@ from graphite.logger import log
 import redis
 import httplib2
 import json
+import logging
 
 #setDefaultSliceCachingBehavior('all')
 
@@ -76,13 +77,16 @@ class MetricfireFinder:
             yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
 
    def _getMetrics(self, uid):
-      conn = httplib2.Http()
-      resp, content = conn.request("%s/%s/metrics/" % (self._mfurl, uid))
-      content = json.loads(content)
-      if resp['status'] == '200':
-         return content['metrics']
-      else:
-         return []
+      metrics = []
+      path = "/var/tmp/wizard/metrics-%s.txt" % uid 
+      try:
+         with open(path) as fh:
+            for line in fh:
+               metrics.append(line.strip())
+      except Exception, ex:
+         logging.error("Failed to load metrics from %s: %s" % (path, ex))
+
+      return metrics
 
 class StandardFinder:
   DATASOURCE_DELIMETER = '::RRD_DATASOURCE::'
