@@ -11,6 +11,7 @@ import redis
 import httplib2
 import json
 import logging
+import marisa_trie
 
 #setDefaultSliceCachingBehavior('all')
 
@@ -77,15 +78,15 @@ class MetricfireFinder:
             yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
 
    def _getMetrics(self, uid):
-      metrics = []
-      path = "/var/tmp/wizard/metrics-%s.txt" % uid 
+      path = "/var/tmp/wizard/metrics-%s.marisatrie" % uid 
+      mtrie = marisa_trie.RecordTrie("<ii")
       try:
-         with open(path) as fh:
-            for line in fh:
-               metrics.append(line.strip())
+         mtrie.mmap(path)
       except Exception, ex:
          logging.error("Failed to load metrics from %s: %s" % (path, ex))
-
+      
+      metrics = mtrie.keys()
+      
       return metrics
 
 class StandardFinder:
