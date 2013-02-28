@@ -23,6 +23,8 @@ from graphite.metrics.search import searcher
 from graphite.carbonlink import CarbonLink
 import fnmatch, os
 
+import storage
+
 try:
   import cPickle as pickle
 except ImportError:
@@ -31,29 +33,15 @@ except ImportError:
 
 def index_json(request):
   jsonp = request.REQUEST.get('jsonp', False)
-  matches = []
 
-  for root, dirs, files in os.walk(settings.WHISPER_DIR):
-    root = root.replace(settings.WHISPER_DIR, '')
-    for basename in files:
-      if fnmatch.fnmatch(basename, '*.wsp'):
-        matches.append(os.path.join(root, basename))
+  nodes = storage.STORE.find(request.user.uid, "**")
+  matches = map(lambda node: node.path, nodes)
+  matches = sorted(matches)
 
-  for root, dirs, files in os.walk(settings.CERES_DIR):
-    root = root.replace(settings.CERES_DIR, '')
-    for filename in files:
-      if filename == '.ceres-node':
-        matches.append(root)
-
-  matches = [
-    m
-    .replace('.wsp', '')
-    .replace('.rrd', '')
-    .replace('/', '.')
-    .lstrip('.')
-    for m in sorted(matches)
-  ]
-  return json_response_for(request, matches, jsonp=jsonp)
+  if jsonp:
+    return HttpResponse("%s(%s)" % (jsonp, json.dumps(matches)), mimetype='text/javascript')
+  else:
+    return HttpResponse(json.dumps(matches), mimetype='application/json')
 
 
 def search_view(request):
