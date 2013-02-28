@@ -39,6 +39,7 @@ urlpatterns = patterns('',
   ('^[a-z0-9]{8}/graphite../render/',                    include('graphite.render.urls')),
   ('^cli/?', include('graphite.cli.urls')),
   ('^[a-z0-9]{8}/graphite/composer/',  include('graphite.composer.urls')),
+  ('^[a-z0-9]{8}/%s/graphite/metrics/' % UUID_PATTERN,   include('graphite.metrics.urls')),
   ('^[a-z0-9]{8}/graphite/metrics/',   include('graphite.metrics.urls')),
   ('^[a-z0-9]{8}/graphite/browser/',   include('graphite.browser.urls')),
 
