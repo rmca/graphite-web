@@ -61,18 +61,51 @@ class MetricfireFinder:
             else:
                yield BranchNode(levels[0])
 
-      # Searching one level down.
-      elif pattern.endswith(".*"):
-         patternroot = pattern[:-1]
+      # Want a set of branch and leaf nodes at this level.
+      #elif pattern.endswith(".*"):
+      #   print "waf"
+      #   patternroot = pattern[:-1]
+      #   for metric in match_entries(metrics, pattern):
+      #      partialmetric = metric[len(patternroot):]
+      #      levels = partialmetric.split(".")
+      #      if len(levels) == 1:
+      #         yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
+      #      else:
+      #         yield BranchNode(patternroot + levels[0])
+      
+      # Want a set of leaf nodes at this level, and branch nodes at this level.
+      elif pattern.endswith("*"):
+         levels_in_pattern = pattern.count(".") + 1
          for metric in match_entries(metrics, pattern):
-            partialmetric = metric[len(patternroot):]
-            levels = partialmetric.split(".")
-            if len(levels) == 1:
+            # Trim the matching metric to the same number of levels as in the pattern.
+            levels = metric.split(".")
+            #print metric
+            #print "found %d levels in metric" % len(levels)
+            #print "trimming to %d levels" % levels_in_pattern
+            if len(levels) == levels_in_pattern:
+               # Leaf node
+               #print "leaf:  ", metric
                yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
             else:
-               yield BranchNode(patternroot + levels[0])
-      
-      # Not doing a search, want a specific leaf node.
+               # Branch node
+               branch = ".".join(levels[:levels_in_pattern])
+               #print "branch:", branch
+               yield BranchNode(branch)
+
+            ## Find the index of the next dot in the path (if any)
+            #try:
+            #   index = metric.index(".", pattern_length)
+            #except ValueError:
+            #   # No more levels, this is a leaf node.
+            #   yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
+            #   continue
+
+            ## Strip any metric content after this level.
+            #metric = metric[:index]
+
+            #yield BranchNode(metric)
+
+      # Not doing a search, want a specific set of leaf nodes.
       else:
          for metric in match_entries(metrics, pattern):
             yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
