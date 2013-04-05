@@ -57,12 +57,17 @@ class MetricfireFinder:
 
       # Initial listing, first level only.
       if pattern == "*":
+         first_level_branch_nodes = set()
          for metric in metrics:
             levels = metric.split(".")
             if len(levels) == 1:
                yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
             else:
-               yield BranchNode(levels[0])
+               # Don't produce the same branch node a bajillion times because other parts of Graphite
+               # seem to be slow at deuping it.
+               if levels[0] not in first_level_branch_nodes:
+                  yield BranchNode(levels[0])
+                  first_level_branch_nodes.add(levels[0])
 
       # Want a set of branch and leaf nodes at this level.
       #elif pattern.endswith(".*"):
