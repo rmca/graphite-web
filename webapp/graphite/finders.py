@@ -122,7 +122,10 @@ class MetricfireFinder:
          logging.error("Failed to load metrics from %s: %s" % (path, ex))
       
       # The marisa trie stuff is picky about only getting unicode inputs for keys and key prefixes.
-      metrics = mtrie.keys(unicode(prefix))
+      if prefix is None or len(prefix) == 0:
+         metrics = mtrie.keys()
+      else:
+         metrics = mtrie.keys(unicode(prefix))
       
       return metrics
 
