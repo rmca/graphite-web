@@ -50,7 +50,10 @@ class MetricfireFinder:
          view = None
          suffix = ""
       
-      metrics = self._getMetrics(uid)
+      # Match metrics up to the first wildcard as an optimisation to take
+      # advantage of the prefix matching offered by marisa tries.
+      prefix = pattern.split("*")[0]
+      metrics = self._getMetrics(uid, prefix)
 
       # Initial listing, first level only.
       if pattern == "*":
@@ -110,7 +113,7 @@ class MetricfireFinder:
          for metric in match_entries(metrics, pattern):
             yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
 
-   def _getMetrics(self, uid):
+   def _getMetrics(self, uid, prefix = None):
       path = "/var/tmp/wizard/metrics-%s.marisatrie" % uid 
       mtrie = marisa_trie.RecordTrie("<ii")
       try:
@@ -118,7 +121,8 @@ class MetricfireFinder:
       except Exception, ex:
          logging.error("Failed to load metrics from %s: %s" % (path, ex))
       
-      metrics = mtrie.keys()
+      # The marisa trie stuff is picky about only getting unicode inputs for keys and key prefixes.
+      metrics = mtrie.keys(unicode(prefix))
       
       return metrics
 
