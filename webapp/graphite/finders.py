@@ -56,7 +56,7 @@ class MetricfireFinder:
       # Limit the matching to metrics that have been seen more recently than
       # three hours before the start of the query period.
       stale_metric_match_period = switches.get("stale_metric_match_period", None)
-      if stale_metric_match_period is not None:
+      if stale_metric_match_period is not None and query.startTime is not None:
          try:
             since = query.startTime - (60 * 60 * int(stale_metric_match_period))
          except ValueError:
