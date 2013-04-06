@@ -49,11 +49,38 @@ class MetricfireFinder:
       else:
          view = None
          suffix = ""
+   
+      # Get the switches dict for this user.
+      switches = json.loads(open("/var/tmp/wizard/uid-switches.json").read())[uid]
       
+      # Limit the matching to metrics that have been seen more recently than
+      # three hours before the start of the query period.
+      stale_metric_match_period = switches.get("stale_metric_match_period", None)
+      if stale_metric_match_period is not None:
+         try:
+            since = query.startTime - (60 * 60 * int(stale_metric_match_period))
+         except ValueError:
+            logging.error("User %s has an invalid stale_metric_match_period: %s" % (uid, repr(stale_metric_match_period)))
+            since = None
+      else:
+         since = None
+      
+      path = "/var/tmp/wizard/metrics-%s.marisatrie" % uid 
+      mtrie = marisa_trie.RecordTrie("<ii")
+      try:
+         mtrie.mmap(path)
+      except Exception, ex:
+         logging.error("Failed to load metrics from %s: %s" % (path, ex))
+
       # Match metrics up to the first wildcard as an optimisation to take
       # advantage of the prefix matching offered by marisa tries.
       prefix = pattern.split("*")[0]
-      metrics = self._getMetrics(uid, prefix)
+      
+      # The marisa trie stuff is picky about only getting unicode inputs for keys and key prefixes.
+      if len(prefix) == 0:
+         metrics = mtrie.keys()
+      else:
+         metrics = mtrie.keys(unicode(prefix))
 
       # Initial listing, first level only.
       if pattern == "*":
@@ -116,23 +143,13 @@ class MetricfireFinder:
       # Not doing a search, want a specific set of leaf nodes.
       else:
          for metric in match_entries(metrics, pattern):
-            yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
+            # Skip this metric if since-limiting is turned on and if the metric hasn't been updated in a while.
+            if since is not None:
+               first, last = mtrie[metric][0]
+               if last < since:
+                  continue
 
-   def _getMetrics(self, uid, prefix = None):
-      path = "/var/tmp/wizard/metrics-%s.marisatrie" % uid 
-      mtrie = marisa_trie.RecordTrie("<ii")
-      try:
-         mtrie.mmap(path)
-      except Exception, ex:
-         logging.error("Failed to load metrics from %s: %s" % (path, ex))
-      
-      # The marisa trie stuff is picky about only getting unicode inputs for keys and key prefixes.
-      if prefix is None or len(prefix) == 0:
-         metrics = mtrie.keys()
-      else:
-         metrics = mtrie.keys(unicode(prefix))
-      
-      return metrics
+            yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
 
 class StandardFinder:
   DATASOURCE_DELIMETER = '::RRD_DATASOURCE::'
