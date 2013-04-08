@@ -12,6 +12,7 @@ import httplib2
 import json
 import logging
 import marisa_trie
+import re
 
 #setDefaultSliceCachingBehavior('all')
 
@@ -74,7 +75,7 @@ class MetricfireFinder:
 
       # Match metrics up to the first wildcard as an optimisation to take
       # advantage of the prefix matching offered by marisa tries.
-      prefix = pattern.split("*")[0]
+      prefix = re.split("[*{]", pattern)[0]
       
       # The marisa trie stuff is picky about only getting unicode inputs for keys and key prefixes.
       if len(prefix) == 0:
