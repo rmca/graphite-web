@@ -30,13 +30,20 @@ try:
 except ImportError:
   import pickle
 
+import marisa_trie
 
 def index_json(request):
   jsonp = request.REQUEST.get('jsonp', False)
 
-  nodes = storage.STORE.find(request.user.uid, "**")
-  matches = map(lambda node: node.path, nodes)
-  matches = sorted(matches)
+  path = "/var/tmp/wizard/metrics-%s.marisatrie" % request.user.uid 
+  mtrie = marisa_trie.RecordTrie("<ii")
+  try:
+     mtrie.mmap(path)
+  except Exception, ex:
+     logging.error("Failed to load metrics from %s: %s" % (path, ex))
+     return HttpResponseServerError("Failed to load metrics.")
+
+  matches = mtrie.keys()
 
   if jsonp:
     return HttpResponse("%s(%s)" % (jsonp, json.dumps(matches)), mimetype='text/javascript')
