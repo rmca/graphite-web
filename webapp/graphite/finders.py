@@ -13,6 +13,7 @@ import json
 import logging
 import marisa_trie
 import re
+import time
 
 #setDefaultSliceCachingBehavior('all')
 
@@ -148,6 +149,10 @@ class MetricfireFinder:
             if since is not None:
                first, last = mtrie[metric][0]
                if last < since:
+                  if switches.get("stale_metric_match_logging", False):
+                     age = int((time.time() - last) / 3600)
+                     logging.warning("Filtered stale metric %s because it was last updated %d hours ago. (%d)" % (metric, age, last))
+                     
                   continue
 
             yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
