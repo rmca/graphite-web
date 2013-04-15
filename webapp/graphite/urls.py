@@ -27,6 +27,12 @@ UUID_PATTERN = '[\w\d]{8}-[\w\d]{4}-[\w\d]{4}-[\w\d]{4}-[\w\d]{12}'
 def forbidden(request):
    return HttpResponseForbidden()
 
+from guppy import hpy
+from django.http import HttpResponse
+
+def dump_memory_use(request):
+   h = hpy()
+   return HttpResponse(str(h.heapu()), mimetype = "text/plain")
 
 urlpatterns = patterns('',
 
@@ -63,6 +69,7 @@ urlpatterns = patterns('',
   # Ban uuid access to non-read-only parts of graphite
   ('^[a-z0-9]{8}/%s/graphite/?.*?/?' % UUID_PATTERN, forbidden),
 
+  ('dump_memory_use', dump_memory_use),
   ('', 'graphite.browser.views.browser')
 )
 
