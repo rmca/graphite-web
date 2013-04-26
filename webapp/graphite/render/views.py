@@ -50,7 +50,7 @@ import graphiteudp
 
 def renderView(request):
   start = time()
-  graphiteudp.send("graphite_web.render.requests", 1)
+  graphiteudp.send("render.requests", 1)
 
   (graphOptions, requestOptions) = parseOptions(request)
   useCache = 'noCache' not in requestOptions
@@ -71,7 +71,7 @@ def renderView(request):
     if cachedResponse:
       log.cache('Request-Cache hit [%s]' % requestKey)
       log.rendering('Returned cached response in %.6f' % (time() - start))
-      graphiteudp.send("graphite_web.render.cached.time", time() - start)
+      graphiteudp.send("render.cached.time", time() - start)
       return cachedResponse
     else:
       log.cache('Request-Cache miss [%s]' % requestKey)
@@ -117,7 +117,7 @@ def renderView(request):
         t = time()
         seriesList = evaluateTarget(requestContext, target)
         log.rendering("Retrieval of %s took %.6f" % (target, time() - t))
-        graphiteudp.send("graphite_web.targetretrieval.time", time() - t)
+        graphiteudp.send("targetretrieval.time", time() - t)
         data.extend(seriesList)
 
     if useCache:
@@ -176,7 +176,7 @@ def renderView(request):
 
       response['Pragma'] = 'no-cache'
       response['Cache-Control'] = 'no-cache'
-      graphiteudp.send("graphite_web.render.json.time", time() - start)
+      graphiteudp.send("render.json.time", time() - start)
       return response
 
     if format == 'raw':
@@ -187,7 +187,7 @@ def renderView(request):
         response.write('\n')
 
       log.rendering('Total rawData rendering time %.6f' % (time() - start))
-      graphiteudp.send("graphite_web.render.raw.time", time() - start)
+      graphiteudp.send("render.raw.time", time() - start)
       return response
 
     if format == 'svg':
@@ -199,7 +199,7 @@ def renderView(request):
       pickle.dump(seriesInfo, response, protocol=-1)
 
       log.rendering('Total pickle rendering time %.6f' % (time() - start))
-      graphiteudp.send("graphite_web.render.pickle.time", time() - start)
+      graphiteudp.send("render.pickle.time", time() - start)
       return response
 
 
@@ -223,9 +223,9 @@ def renderView(request):
 
   log.rendering('Total rendering time %.6f seconds' % (time() - start))
   if useSVG:
-     graphiteudp.send("graphite_web.render.svg.time", time() - start)
+     graphiteudp.send("render.svg.time", time() - start)
   else:
-     graphiteudp.send("graphite_web.render.png.time", time() - start)
+     graphiteudp.send("render.png.time", time() - start)
 
   return response
 
