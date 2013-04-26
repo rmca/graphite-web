@@ -14,3 +14,10 @@ DATABASES:
       HOST: ''
       PORT: ''
 
+GRAPHITE:
+   enabled: true
+   host: carbon.hostedgraphite.com
+   port: 2003
+   key: 7aa099bd-29ae-478f-b1aa-6b4b4e2ef878
+   debug: false
+

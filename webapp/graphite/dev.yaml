@@ -9,3 +9,5 @@ DATABASES:
       HOST: ''
       PORT: ''
 
++GRAPHITE:
+   debug: true

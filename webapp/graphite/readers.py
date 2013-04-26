@@ -8,6 +8,7 @@ from django.conf import settings
 import httplib2
 import json
 import logging
+import graphiteudp
 
 try:
   import whisper
@@ -280,8 +281,12 @@ class MetricfireReader:
 
    def fetch(self, startTime, endTime):
 
+      before = time.time()
+
       conn = httplib2.Http()
       resp, content = conn.request("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view))
+
+      graphiteudp.send("reader.fetch", time.time() - before)
    
       if resp['status'] == '200':
          resolution, values = json.loads(content)

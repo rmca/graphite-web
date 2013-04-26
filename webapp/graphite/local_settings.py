@@ -255,3 +255,11 @@ if 'manage.py' in sys.argv and os.environ.get('DJANGOCONFIG', None) != "prod":
       if ex.errno != 2: # Does not exist
          raise
 
+import graphiteudp
+import socket
+
+# If graphite instrumentation is enabled in the config, set it up.
+if GRAPHITE['enabled']:
+   prefix = "%s.graphiteweb.%s" % (GRAPHITE['key'], socket.gethostname())
+   graphiteudp.init(host = GRAPHITE['host'], port = GRAPHITE['port'], prefix = prefix, debug = GRAPHITE['debug'])
+
