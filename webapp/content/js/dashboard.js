@@ -2445,7 +2445,6 @@ function deleteDashboard(name) {
 
 function slugify(text) {
 	text = text.replace(/[^_-a-zA-Z0-9,&\s]+/ig, '');
-    text = text.replace(/_/gi, "-");
 	text = text.replace(/\s/gi, "-");
 	return text.toLowerCase();
 }

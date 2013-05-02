@@ -202,6 +202,7 @@ def save(request, name):
 
 
 def load(request, slug):
+  slug = slugify(slug)
   try:
     dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
   except Dashboard.DoesNotExist:
