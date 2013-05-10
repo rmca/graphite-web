@@ -123,6 +123,8 @@ def renderView(request):
     if useCache:
       cache.set(dataKey, data, cacheTimeout)
 
+    postRetrievalTime = time()
+
     # If data is all we needed, we're done
     format = requestOptions.get('format')
     if format == 'csv':
@@ -176,7 +178,7 @@ def renderView(request):
 
       response['Pragma'] = 'no-cache'
       response['Cache-Control'] = 'no-cache'
-      graphiteudp.send("render.json.time", time() - start)
+      graphiteudp.send("render.json.time", time() - postRetrievalTime)
       return response
 
     if format == 'raw':
@@ -187,7 +189,7 @@ def renderView(request):
         response.write('\n')
 
       log.rendering('Total rawData rendering time %.6f' % (time() - start))
-      graphiteudp.send("render.raw.time", time() - start)
+      graphiteudp.send("render.raw.time", time() - postRetrievalTime)
       return response
 
     if format == 'svg':
@@ -199,9 +201,10 @@ def renderView(request):
       pickle.dump(seriesInfo, response, protocol=-1)
 
       log.rendering('Total pickle rendering time %.6f' % (time() - start))
-      graphiteudp.send("render.pickle.time", time() - start)
+      graphiteudp.send("render.pickle.time", time() - postRetrievalTime)
       return response
 
+  postRetrievalTime = time()
 
   # We've got the data, now to render it
   graphOptions['data'] = data
@@ -223,9 +226,9 @@ def renderView(request):
 
   log.rendering('Total rendering time %.6f seconds' % (time() - start))
   if useSVG:
-     graphiteudp.send("render.svg.time", time() - start)
+     graphiteudp.send("render.svg.time", time() - postRetrievalTime)
   else:
-     graphiteudp.send("render.png.time", time() - start)
+     graphiteudp.send("render.png.time", time() - postRetrievalTime)
 
   return response
 
