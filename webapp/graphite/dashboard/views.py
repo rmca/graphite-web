@@ -216,7 +216,7 @@ def delete(request, name):
     return json_response( dict(error="Must be logged in with appropriate permissions to delete") )
 
   try:
-    dashboard = Dashboard.objects.get(name=name, owners__user=request.user)
+    dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
   except Dashboard.DoesNotExist:
     return json_response( dict(error="Dashboard '%s' does not exist. " % name) )
   else:

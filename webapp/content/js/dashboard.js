@@ -2428,9 +2428,9 @@ function applyState(state) {
   refreshGraphs();
 }
 
-function deleteDashboard(name) {
+function deleteDashboard(name, slug) {
   Ext.Ajax.request({
-    url: "dashboard/delete/" + name,
+    url: "../dashboard/delete/" + slug,
     success: function (response) {
       var result = Ext.decode(response.responseText);
       if (result.error) {
@@ -2595,13 +2595,14 @@ function showDashboardFinder() {
     if (selected.length > 0) {
       var record = selected[0];
       var name = record.data.name;
+      var slug = record.data.slug;
 
       Ext.Msg.confirm(
        "Delete Dashboard",
         "Are you sure you want to delete the " + name + " dashboard?",
         function (button) {
           if (button == 'yes') {
-            deleteDashboard(name);
+            deleteDashboard(name, slug);
             dashboardsStore.remove(record);
             dashboardsList.refresh();
           }
