@@ -283,6 +283,11 @@ def match_entries(entries, pattern):
     variants = [ pattern[:v1] + v + pattern[v2+1:] for v in variations ]
     matching = []
 
+    # This makes len(variants) passes over entries, so we need to make sure
+    # entries is a list and not a generator, otherwise only the first variant
+    # will be matched.
+    entries = list(entries)
+
     for variant in variants:
       matching.extend( fnmatch.filter(entries, variant) )
 
