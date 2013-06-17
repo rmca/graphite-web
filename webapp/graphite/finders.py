@@ -80,9 +80,9 @@ class MetricfireFinder:
       
       # The marisa trie stuff is picky about only getting unicode inputs for keys and key prefixes.
       if len(prefix) == 0:
-         metrics = mtrie.keys()
+         metrics = mtrie.iterkeys()
       else:
-         metrics = mtrie.keys(unicode(prefix))
+         metrics = mtrie.iterkeys(unicode(prefix))
 
       # Initial listing, first level only.
       if pattern == "*":
