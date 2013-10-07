@@ -263,3 +263,8 @@ if GRAPHITE['enabled']:
    prefix = "%s.graphiteweb.%s" % (GRAPHITE['key'], socket.gethostname())
    graphiteudp.init(host = GRAPHITE['host'], port = GRAPHITE['port'], prefix = prefix, debug = GRAPHITE['debug'])
 
+# Hacky fix for Graphite needing django 1.5ish when we want to run it with 1.3.
+import django.conf.urls.defaults
+django.conf.urls.patterns = django.conf.urls.defaults.patterns
+django.conf.urls.include = django.conf.urls.defaults.include
+
