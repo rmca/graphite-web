@@ -170,7 +170,7 @@ def getPermissions(user):
   return permissions
   
 
-def save(request, name):
+def save(request):
   if 'change' not in getPermissions(request.user):
     return json_response( dict(error="Must be logged in with appropriate permissions to save") )
   # Deserialize and reserialize as a validation step

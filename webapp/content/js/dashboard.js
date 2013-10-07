@@ -70,7 +70,7 @@ var ContextFieldValueRecord = Ext.data.Record.create([
 ]);
 
 var contextFieldStore = new Ext.data.JsonStore({
-  url: 'metrics/find/',
+  url: '../metrics/find/',
   root: 'metrics',
   idProperty: 'name',
   fields: ContextFieldValueRecord,
@@ -300,7 +300,7 @@ function initDashboard () {
       }),
       store: new Ext.data.JsonStore({
         method: 'GET',
-        url: 'metrics/find/',
+        url: '../metrics/find/',
         autoLoad: true,
         baseParams: {
           query: '',
@@ -886,7 +886,7 @@ function metricTreeSelectorShow(pattern) {
   }
 
   var loader = new Ext.tree.TreeLoader({
-    url: 'metrics/find/',
+    url: '../metrics/find/',
     requestMethod: 'GET',
     listeners: {beforeload: setParams}
   });
@@ -968,7 +968,7 @@ function graphAreaToggle(target, options) {
 }
 
 function importGraphUrl(targetUrl, options) {
-  var fullUrl = targetUrl;
+  var fullUrl = decodeURIComponent(targetUrl).replace(/#/,'%23');
   var i = fullUrl.indexOf("?");
   if (i == -1) {
     return;
@@ -1380,7 +1380,7 @@ function newFromSavedGraph() {
     expandable: true,
     allowDrag: false,
     loader: new Ext.tree.TreeLoader({
-      url: "browser/usergraph/",
+      url: "../browser/usergraph/",
       requestMethod: "GET",
       listeners: {beforeload: setParams}
     })
@@ -1584,7 +1584,7 @@ function selectGraphSize() {
 function doShare() {
   if (dashboardName == null) {
     Ext.Ajax.request({
-      url: "dashboard/create-temporary/",
+      url: "../dashboard/create-temporary/",
       method: 'POST',
       params: {
         state: Ext.encode( getState() )
@@ -1972,7 +1972,7 @@ function breakoutGraph(record) {
   }
 
   Ext.Ajax.request({
-    url: 'metrics/expand/',
+    url: '../metrics/expand/',
     params: {
       groupByExpr: '1',
       leavesOnly: '1',
@@ -2043,7 +2043,7 @@ function mailGraph(record) {
          handler: function(){
            if(contactForm.getForm().isValid()){
              contactForm.getForm().submit({
-               url: 'dashboard/email',
+               url: '../dashboard/email',
                waitMsg: 'Processing Request',
                success: function (contactForm, response) {
          console.log(response.result);
@@ -2344,7 +2344,7 @@ function sendSaveRequest(name) {
 
 function sendLoadRequest(name) {
   Ext.Ajax.request({
-    url: "dashboard/load/" + name,
+    url: "../dashboard/load/" + name,
     success: function (response) {
                var result = Ext.decode(response.responseText);
                if (result.error) {
@@ -2560,7 +2560,7 @@ function showDashboardFinder() {
   var dashboardsList;
   var queryField;
   var dashboardsStore = new Ext.data.JsonStore({
-    url: "dashboard/find/",
+    url: "../dashboard/find/",
     method: 'GET',
     params: {query: "e"},
     fields: [{
