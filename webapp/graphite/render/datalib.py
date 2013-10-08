@@ -16,6 +16,8 @@ import time
 from graphite.logger import log
 from graphite.storage import STORE
 from graphite.readers import FetchInProgress
+import datetime
+import pytz
 
 
 class TimeSeries(list):
@@ -91,8 +93,11 @@ class TimeSeries(list):
 def fetchData(requestContext, pathExpr):
 
   seriesList = []
-  startTime = int( time.mktime( requestContext['startTime'].timetuple() ) )
-  endTime   = int( time.mktime( requestContext['endTime'].timetuple() ) )
+
+  # Convert tz-aware datetime objects to UNIX timestamps.
+  epoch = datetime.datetime(1970, 1, 1, 0, 0, 0, tzinfo = pytz.utc) 
+  startTime = (requestContext['startTime'] - epoch).total_seconds()
+  endTime = (requestContext['endTime'] - epoch).total_seconds()
 
   matching_nodes = STORE.find(requestContext['uid'], pathExpr, startTime, endTime, local=requestContext['localOnly'])
   fetches = [(node, node.fetch(startTime, endTime)) for node in matching_nodes if node.is_leaf]
