@@ -2563,11 +2563,11 @@ function showDashboardFinder() {
     url: "../dashboard/find/",
     method: 'GET',
     params: {query: "e"},
-    fields: [{
-      name: {name: 'slug'},
+    fields: [{name: 'slug'}, {
+      name: 'name',
       sortType: function(value) {
-	// Make sorting case-insensitive
-        return value.toLowerCase();
+         // Make sorting case-insensitive
+         return value.toLowerCase();
       }
     }],
     root: 'dashboards',
