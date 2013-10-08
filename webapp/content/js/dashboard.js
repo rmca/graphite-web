@@ -2564,7 +2564,7 @@ function showDashboardFinder() {
     method: 'GET',
     params: {query: "e"},
     fields: [{
-      name: ['name', 'slug'],
+      name: {name: 'slug'},
       sortType: function(value) {
 	// Make sorting case-insensitive
         return value.toLowerCase();
