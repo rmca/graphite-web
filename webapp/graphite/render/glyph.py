@@ -58,9 +58,9 @@ colorAliases = {
 
 # This gets overriden by graphTemplates.conf
 defaultGraphOptions = dict(
-  background='white',
-  foreground='black',
-  majorline='rose',
+  background='black',
+  foreground='white',
+  majorline='white',
   minorline='grey',
   linecolors='blue,green,red,purple,brown,yellow,aqua,grey,magenta,pink,gold,rose',
   fontname='Sans',
