@@ -56,8 +56,12 @@
     <script type="text/javascript" src="/content/js/ext/ext-all{% if jsdebug %}-debug{% endif %}.js"></script>
     <script type="text/javascript" src="/content/js/ext/ux/DataViewTransition.js"></script>
     <script type="text/javascript" src="/content/js/composer_widgets.js"></script>
-    <script type="text/javascript" src="/content/js/dashboard.js"></script>
-    <script type="text/javascript" src="/content/js/ace/ace.js"></script>
+     {% if integrationPartner == 'Basho' %}
+        <script type="text/javascript" src="/content/js/basho/dashboard.js"></script>
+    {% else %}
+        <script type="text/javascript" src="/content/js/dashboard.js"></script>
+    {% endif %}
+     <script type="text/javascript" src="/content/js/ace/ace.js"></script>
     <script type="text/javascript" src="/content/js/ace/mode-json.js"></script>
     <script type="text/javascript" src="/content/js/ace/theme-textmate.js"></script>
 

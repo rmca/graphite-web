@@ -108,6 +108,10 @@ config = DashboardConfig()
 def dashboard(request, slug=None):
   dashboard_conf_missing = False
 
+  integrationPartner = None
+  if 'HTTP_INTEGRATION_PARTNER' in request.META:
+    integrationPartner = request.META["HTTP_INTEGRATION_PARTNER"]
+
   try:
     config.check()
   except OSError, e:
@@ -133,6 +137,7 @@ def dashboard(request, slug=None):
     'initialError' : initialError,
     'querystring' : json.dumps( dict( request.GET.items() ) ),
     'dashboard_conf_missing' : dashboard_conf_missing,
+    'integrationPartner' : integrationPartner,
     'userName': '',
     'permissions': json.dumps(getPermissions(request.user)),
     'permissionsUnauthenticated': json.dumps(getPermissions(None))
@@ -203,6 +208,10 @@ def save(request):
 
 def load(request, slug):
   slug = slugify(slug)
+
+
+
+
   try:
     dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
   except Dashboard.DoesNotExist:
