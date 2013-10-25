@@ -21,7 +21,7 @@ var NOT_EDITABLE = ['from', 'until', 'width', 'height', 'target', 'uniq', '_uniq
 var editor = null;
 
 var cookieProvider = new Ext.state.CookieProvider({
-  path: "/dashboard"
+  path: "../dashboard"
 });
 
 var NAV_BAR_REGION = cookieProvider.get('navbar-region') || 'north';
