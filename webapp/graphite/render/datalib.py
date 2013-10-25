@@ -96,8 +96,8 @@ def fetchData(requestContext, pathExpr):
 
   # Convert tz-aware datetime objects to UNIX timestamps.
   epoch = datetime.datetime(1970, 1, 1, 0, 0, 0, tzinfo = pytz.utc) 
-  startTime = (requestContext['startTime'] - epoch).total_seconds()
-  endTime = (requestContext['endTime'] - epoch).total_seconds()
+  startTime = int((requestContext['startTime'] - epoch).total_seconds())
+  endTime = int((requestContext['endTime'] - epoch).total_seconds())
 
   matching_nodes = STORE.find(requestContext['uid'], pathExpr, startTime, endTime, local=requestContext['localOnly'])
   fetches = [(node, node.fetch(startTime, endTime)) for node in matching_nodes if node.is_leaf]
