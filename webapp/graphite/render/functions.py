@@ -2635,6 +2635,9 @@ def hitcount(requestContext, seriesList, intervalString, alignToInterval = False
   for series in seriesList:
     length = len(series)
     step = int(series.step)
+    # Extend the series end time by the interval to ensure the graph ends
+    # at the time the user specified, not one interval earlier.
+    series.end += interval
     bucket_count = int(math.ceil(float(series.end - series.start) / interval))
     buckets = [[] for _ in range(bucket_count)]
     newStart = int(series.end - bucket_count * interval)
