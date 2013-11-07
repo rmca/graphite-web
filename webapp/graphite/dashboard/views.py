@@ -220,14 +220,14 @@ def load(request, slug):
   return json_response( dict(state=json.loads(dashboard.state), slug=dashboard.slug) )
 
 
-def delete(request, name):
+def delete(request, slug):
   if 'delete' not in getPermissions(request.user):
     return json_response( dict(error="Must be logged in with appropriate permissions to delete") )
 
   try:
     dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
   except Dashboard.DoesNotExist:
-    return json_response( dict(error="Dashboard '%s' does not exist. " % name) )
+    return json_response( dict(error="Dashboard '%s' does not exist. " % slug) )
   else:
     dashboard.delete()
     return json_response( dict(success=True) )
