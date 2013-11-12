@@ -50,3 +50,14 @@ class MyGraph(models.Model):
   profile = models.ForeignKey(Profile)
   name = models.CharField(max_length=64)
   url = models.TextField()
+
+
+
+# Allows us access to a user profile's user switches and uid when given a user.
+class UserProfile(models.Model):
+   user                = models.OneToOneField(auth_models.User)
+   userSwitches        = models.TextField(blank = True)
+   uid                 = models.CharField(max_length = 8, unique = True)
+
+   class Meta:
+      db_table = "app_userprofile"
