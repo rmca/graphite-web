@@ -21,3 +21,4 @@ GRAPHITE:
    key: 7aa099bd-29ae-478f-b1aa-6b4b4e2ef878
    debug: false
 
+AUTH_PROFILE_MODULE: account.UserProfile
