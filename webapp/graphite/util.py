@@ -39,7 +39,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
 from graphite.account.models import Profile
 from graphite.logger import log
-
+import datetime
+import pytz
 
 # There are a couple different json modules floating around out there with
 # different APIs. Hide the ugliness here.
@@ -140,9 +141,11 @@ def load_module(module_path, member=None):
   else:
     return module
 
-def timestamp(datetime):
+def timestamp(dt):
   "Convert a datetime object into epoch time"
-  return time.mktime( datetime.timetuple() )
+  # Convert tz-aware datetime objects to UNIX timestamp.
+  epoch = datetime.datetime(1970, 1, 1, 0, 0, 0, tzinfo = pytz.utc) 
+  return int((dt - epoch).total_seconds())
 
 # This whole song & dance is due to pickle being insecure
 # The SafeUnpickler classes were largely derived from
