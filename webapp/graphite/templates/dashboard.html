@@ -56,8 +56,8 @@
     <script type="text/javascript" src="/content/js/ext/ext-all{% if jsdebug %}-debug{% endif %}.js"></script>
     <script type="text/javascript" src="/content/js/ext/ux/DataViewTransition.js"></script>
     <script type="text/javascript" src="/content/js/composer_widgets.js"></script>
-     {% if integrationPartner == 'Basho' %}
-        <script type="text/javascript" src="/content/js/basho/dashboard.js"></script>
+     {% if integrationPartner == 'Basho' or isReadOnly %}
+        <script type="text/javascript" src="/content/js/readonly/dashboard.js"></script>
     {% else %}
         <script type="text/javascript" src="/content/js/dashboard.js"></script>
     {% endif %}
