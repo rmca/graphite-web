@@ -502,7 +502,7 @@ function initDashboard () {
         '-',
         relativeTimeRange,
         absoluteTimeRange,
-        ' ',
+        '-',
         timeRangeText,
         '->',
         //helpButton,
@@ -555,16 +555,6 @@ function initDashboard () {
 
 }
 
-function showHelp() {
-  var win = new Ext.Window({
-    title: "Keyboard Shortcuts",
-    modal: true,
-    width: 550,
-    height: 300,
-    autoLoad: "/dashboard/help/"
-  });
-  win.show();
-}
 
 function metricTypeSelected (combo, record, index) {
   selectedScheme = record;
@@ -774,48 +764,6 @@ function graphAreaToggle(target, options) {
   }
 }
 
-function importGraphUrl(targetUrl, options) {
-  var fullUrl = decodeURIComponent(targetUrl).replace(/#/,'%23');
-  var i = fullUrl.indexOf("?");
-  if (i == -1) {
-    return;
-  }
-
-  var queryString = fullUrl.substr(i+1);
-  var params = Ext.urlDecode(queryString);
-
-  var graphTargetList = params['target'];
-  if (typeof graphTargetList == 'string') {
-    graphTargetList = [graphTargetList];
-  }
-  params['target'] = graphTargetList;
-
-  if (!graphTargetList || graphTargetList.length == 0) {
-    return;
-  }
-
-  var graphTargetString = Ext.urlEncode({target: graphTargetList});
-  var existingIndex = graphStore.findExact('target', graphTargetString);
-
-  if (existingIndex > -1) {
-    if ( (options === undefined) || (!options.dontRemove) ) {
-      graphStore.removeAt(existingIndex);
-    }
-  } else {
-    var urlParams = {};
-    Ext.apply(urlParams, defaultGraphParams);
-    Ext.apply(urlParams, params);
-    Ext.apply(urlParams, GraphSize);
-
-    var record = new GraphRecord({
-      target: graphTargetString,
-      params: params,
-      url: '/render/?' + Ext.urlEncode(urlParams)
-      });
-      graphStore.add([record]);
-      updateGraphRecords();
-  }
-}
 
 function updateGraphRecords() {
   graphStore.each(function (item, index) {
@@ -843,25 +791,6 @@ function refreshGraphs() {
   graphView.refresh();
   graphArea.getTopToolbar().get('last-refreshed-text').setText( (new Date()).format('g:i:s A') );
 }
-
-/*
-function refreshGraph(index) {
-  var node = graphView.getNode(index);
-  var record = graphView.getRecord(node);
-  record.data.params.uniq = Math.random();
-  record.set('url', '/render?' + Ext.urlEncode(record.get('params')));
-
-  // This refreshNode method only refreshes the record data, it doesn't re-render
-  // the template. Which is pretty useless... It would be more efficient if we
-  // could simply re-render the template. Need to see if thats feasible.
-  //graphView.refreshNode(node);
-
-  // This is *slightly* better than just calling refreshGraphs() because we're only
-  // updating the URL of one graph, so caching should save us from re-rendering each
-  // graph.
-  //graphView.refresh();
-}
-*/
 
 function updateAutoRefresh (newValue) {
   Ext.getCmp('auto-refresh-field').setValue(newValue);
@@ -1119,196 +1048,6 @@ var GraphSize = {
 };
 
 
-//XXX Add once graph controls allow better +/-
-//function newEmptyGraph() {
-//}
-
-function newFromUrl() {
-  function applyUrl() {
-    var inputUrl = Ext.getCmp('import-url-field').getValue();
-    importGraphUrl(inputUrl);
-    win.close();
-  }
-
-  var urlField = new Ext.form.TextField({
-    id: 'import-url-field',
-    fieldLabel: "Graph URL",
-    region: 'center',
-    width: '100%',
-    listeners: {
-      specialkey: function (field, e) {
-                    if (e.getKey() == e.ENTER) {
-                      applyUrl();
-                    }
-                  },
-      afterrender: function (field) { field.focus(false, 100); }
-    }
-  });
-
-  var win = new Ext.Window({
-    title: "Import Graph From URL",
-    width: 470,
-    height: 87,
-    layout: 'form',
-    resizable: true,
-    modal: true,
-    items: [urlField],
-    buttonAlign: 'center',
-    buttons: [
-      {
-        text: 'OK',
-        handler: applyUrl
-      }, {
-        text: 'Cancel',
-        handler: function () { win.close(); }
-      }
-    ]
-  });
-  win.show();
-
-}
-
-function newFromSavedGraph() {
-  function setParams(loader, node) {
-    var node_id = node.id.replace(/^[A-Za-z]+Tree\.?/,"");
-    loader.baseParams.query = (node_id == "") ? "*" : (node_id + ".*");
-    loader.baseParams.format = 'treejson';
-    loader.baseParams.contexts = '1';
-    loader.baseParams.path = node_id;
-    if (node.parentNode && node.parentNode.id == "UserGraphsTree") {
-      loader.baseParams.user = node.id;
-    }
-  }
-
-  var userGraphsNode = new Ext.tree.AsyncTreeNode({
-    id: 'UserGraphsTree',
-    leaf: false,
-    allowChildren: true,
-    expandable: true,
-    allowDrag: false,
-    loader: new Ext.tree.TreeLoader({
-      url: "../browser/usergraph/",
-      requestMethod: "GET",
-      listeners: {beforeload: setParams}
-    })
-  });
-
-  function handleSelects(selModel, nodes) {
-    Ext.each(nodes, function (node, index) {
-      if (!node.leaf) {
-	node.unselect();
-        node.toggle();
-      }
-    });
-
-    if (selModel.getSelectedNodes().length == 0) {
-      Ext.getCmp('user-graphs-select-button').setDisabled(true);
-    } else {
-      Ext.getCmp('user-graphs-select-button').setDisabled(false);
-    }
-  }
-
-  var treePanel = new Ext.tree.TreePanel({
-    id: 'user-graphs-tree',
-    header: false,
-    region: 'center',
-    root: userGraphsNode,
-    containerScroll: true,
-    autoScroll: true,
-    pathSeparator: '.',
-    rootVisible: false,
-    singleExpand: false,
-    trackMouseOver: true,
-    selModel: new Ext.tree.MultiSelectionModel({
-      listeners: {
-        selectionchange: handleSelects
-      }
-    })
-  });
-
-  function selectUserGraphs(selectedNodes) {
-    Ext.each(selectedNodes, function (node, index) {
-      importGraphUrl(node.attributes.graphUrl);
-    });
-  }
-
-  var win = new Ext.Window({
-    title: "Import From User Graphs",
-    width: 300,
-    height: 400,
-    layout: 'border',
-    resizable: true,
-    modal: true,
-    items: [treePanel],
-    buttonAlign: 'center',
-    buttons: [
-      {
-        id: 'user-graphs-select-button',
-        text: 'Select',
-        disabled: true,
-        handler: function () {
-          selectUserGraphs(Ext.getCmp('user-graphs-tree').getSelectionModel().getSelectedNodes());
-          win.close();
-        }
-      }, {
-        text: 'Cancel',
-        handler: function () { win.close(); }
-      }
-    ]
-  });
-  win.show();
-}
-
-function editDefaultGraphParameters() {
-  var editParams = Ext.apply({}, defaultGraphParams);
-  removeUneditable(editParams);
-
-  function applyParams() {
-    var paramsString = Ext.getCmp('default-params-field').getValue();
-    var params = Ext.urlDecode(paramsString);
-    copyUneditable(defaultGraphParams, params);
-    defaultGraphParams = params;
-    saveDefaultGraphParams();
-    refreshGraphs();
-    win.close();
-  }
-
-  var paramsField = new Ext.form.TextField({
-    id: 'default-params-field',
-    region: 'center',
-    value: Ext.urlEncode(editParams),
-    listeners: {
-      specialkey: function (field, e) {
-                    if (e.getKey() == e.ENTER) {
-                      applyParams();
-                    }
-                  },
-      afterrender: function (field) { field.focus(false, 100); }
-    }
-  });
-
-  var win = new Ext.Window({
-    title: "Default Graph Parameters",
-    width: 470,
-    height: 87,
-    layout: 'border',
-    resizable: true,
-    modal: true,
-    items: [paramsField],
-    buttonAlign: 'center',
-    buttons: [
-      {
-        text: 'OK',
-        handler: applyParams
-      }, {
-        text: 'Cancel',
-        handler: function () { win.close(); }
-      }
-    ]
-  });
-  win.show();
-}
-
 function selectGraphSize() {
   var presetCombo = new Ext.form.ComboBox({
     fieldLabel: "Preset",
@@ -1357,7 +1096,7 @@ function selectGraphSize() {
     regexText: "Please enter a number",
     allowBlank: false,
     value: GraphSize.height || UI_CONFIG.default_graph_height
-  })
+  });
 
   var win;
 
@@ -1394,11 +1133,6 @@ function selectGraphSize() {
 /* Other stuff */
 var targetGrid;
 var activeMenu;
-
-function graphClicked(graphView, graphIndex, element, evt) {
-  
-}
-
 
 function removeUneditable (obj) {
   Ext.each(NOT_EDITABLE, function (p) {
@@ -1945,12 +1679,7 @@ function showDashboardFinder() {
         text: "Open",
         disabled: true,
         handler: openSelected
-      },/* {
-        id: 'finder-delete-button',
-        text: "Delete",
-        disabled: true,
-        handler: deleteSelected
-      }, */{
+      },{
         text: "Close",
         handler: function () { win.close(); }
       }
