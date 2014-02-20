@@ -129,6 +129,7 @@ def dashboard(request, slug=None):
     theme = config.ui_config['theme']
 
   context = {
+    'isReadOnly'   : 'READ_ONLY_USER' in request.session,
     'schemes_json' : json.dumps(config.schemes),
     'ui_config_json' : json.dumps(config.ui_config),
     'jsdebug' : debug or settings.JAVASCRIPT_DEBUG,
