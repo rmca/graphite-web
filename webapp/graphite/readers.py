@@ -287,6 +287,7 @@ class MetricfireReader:
       resp, content = conn.request("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view))
 
       graphiteudp.send("reader.fetch", time.time() - before)
+      graphiteudp.send("reader.uid.%s.fetch" % self._uid, time.time() - before)
    
       if resp['status'] == '200':
          resolution, values = json.loads(content)
