@@ -5,10 +5,16 @@ from graphite.intervals import Interval, IntervalSet
 from graphite.carbonlink import CarbonLink
 from graphite.logger import log
 from django.conf import settings
-import httplib2
 import json
 import logging
 import graphiteudp
+
+import requests
+
+# Turn off info messages from requests, which is too damn noisy.
+requests_log = logging.getLogger("requests")
+requests_log.setLevel(logging.WARNING)
+
 
 try:
   import whisper
@@ -282,15 +288,14 @@ class MetricfireReader:
    def fetch(self, startTime, endTime):
 
       before = time.time()
-
-      conn = httplib2.Http()
-      resp, content = conn.request("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view))
+      
+      response = requests.get("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view), timeout = settings.MFTIMEOUT)
 
       graphiteudp.send("reader.fetch", time.time() - before)
       graphiteudp.send("reader.uid.%s.fetch" % self._uid, time.time() - before)
    
-      if resp['status'] == '200':
-         resolution, values = json.loads(content)
+      if response.status_code == 200:
+         resolution, values = response.json()
       else:
          logging.error("Metric data fetch failed, got http %s, expected 200" % resp['status'])
          resolution = 60 # TODO choose a sane value here? does it matter?
