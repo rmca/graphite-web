@@ -289,15 +289,23 @@ class MetricfireReader:
 
       before = time.time()
       
-      response = requests.get("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view), timeout = settings.MFTIMEOUT)
+      try:
+         response = requests.get("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view), timeout = settings.MFTIMEOUT)
+      except requests.exceptions.Timeout:
+         graphiteudp.send("reader.timeout", 1)
+         response = None
 
       graphiteudp.send("reader.fetch", time.time() - before)
       graphiteudp.send("reader.uid.%s.fetch" % self._uid, time.time() - before)
    
-      if response.status_code == 200:
+      if response and response.status_code == 200:
          resolution, values = response.json()
       else:
-         logging.error("Metric data fetch failed, got http %s, expected 200" % resp['status'])
+         if response:
+            logging.error("Metric data fetch failed, got http %s, expected 200" % resp['status'])
+         else:
+            logging.error("Metric data fetch failed, timed out.")
+
          resolution = 60 # TODO choose a sane value here? does it matter?
          values = []
 
