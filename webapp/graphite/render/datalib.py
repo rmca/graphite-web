@@ -19,32 +19,14 @@ from graphite.readers import FetchInProgress
 import datetime
 import pytz
 
-consolidation_mapping = {
-      "avg":      "average"
-   ,  "min":      "min"
-   ,  "max":      "max"
-   ,  "sum":      "sum"
-   ,  "sumrate":  "sum"
-   ,  "obvs":     "sum"
-   ,  "obvsrate": "sum"
-   }
 
 class TimeSeries(list):
-  def __init__(self, name, start, end, step, values, consolidate = None):
+  def __init__(self, name, start, end, step, values, consolidate='average'):
     list.__init__(self, values)
     self.name = name
     self.start = start
     self.end = end
     self.step = step
-    if consolidate is None:
-      # Try to determine appropriate consolidation function from the metric name.
-      consolidate_slug = name.split(":")[-1]
-      try:
-         consolidate = consolidation_mapping[consolidate_slug]
-      except KeyError:
-         consolidate = "average"
-    else:
-      consolidate = "average"
     self.consolidationFunc = consolidate
     self.valuesPerPoint = 1
     self.options = {}
