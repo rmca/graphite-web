@@ -81,7 +81,7 @@ def renderView(request):
       log.rendering('Returned cached response in %.6f' % (time() - start))
       graphiteudp.send("render.cached.time", time() - start)
       if title is not None:
-         graphiteudp.send("graph.%s.%s.load" % (request.user.uid, title), time() - start)
+         graphiteudp.send("graph.%s.%s.cache.load" % (request.user.uid, title), time() - start)
 
       return cachedResponse
     else:
