@@ -301,9 +301,12 @@ class MetricfireReader:
       if response and response.status_code == 200:
          resolution, values = response.json()
       else:
+         graphiteudp.send("reader.fetch.failure", 1)
          if response:
-            logging.error("Metric data fetch failed, got http %s, expected 200" % resp['status'])
+            graphiteudp.send("reader.fetch.%s" % response.status_code, 1)
+            logging.error("Metric data fetch failed, got http %s, expected 200" % response.status_code)
          else:
+            graphiteudp.send("reader.fetch.timeout", 1)
             logging.error("Metric data fetch failed, timed out.")
 
          resolution = 60 # TODO choose a sane value here? does it matter?
