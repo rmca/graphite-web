@@ -21,6 +21,8 @@ from urllib import urlencode
 from urlparse import urlsplit, urlunsplit
 from cgi import parse_qs
 from cStringIO import StringIO
+from django.template.defaultfilters import slugify
+
 try:
   import cPickle as pickle
 except ImportError:
@@ -62,6 +64,12 @@ def renderView(request):
     'localOnly' : requestOptions['localOnly'],
     'data' : []
   }
+
+  title = None
+  if 'title' in request.REQUEST:
+      title = slugify(request.REQUEST['title'])
+
+
   data = requestContext['data']
 
   # First we check the request cache
@@ -72,6 +80,9 @@ def renderView(request):
       log.cache('Request-Cache hit [%s]' % requestKey)
       log.rendering('Returned cached response in %.6f' % (time() - start))
       graphiteudp.send("render.cached.time", time() - start)
+      if title is not None:
+         graphiteudp.send("graph.%s.%s.cache.load" % (request.user.uid, title), time() - start)
+
       return cachedResponse
     else:
       log.cache('Request-Cache miss [%s]' % requestKey)
@@ -223,6 +234,9 @@ def renderView(request):
 
   if useCache:
     cache.set(requestKey, response, cacheTimeout)
+
+  if title is not None:
+     graphiteudp.send("graph.%s.%s.load" % (request.user.uid, title), time() - start)
 
   log.rendering('Total rendering time %.6f seconds' % (time() - start))
   if useSVG:
