@@ -23,3 +23,7 @@ GRAPHITE:
    debug: false
 
 AUTH_PROFILE_MODULE: account.UserProfile
+
+# Number of seconds beyond which metric data fetching will be stopped and the
+# request will proceed with only partial data.
+FETCH_TIMEOUT: 30
