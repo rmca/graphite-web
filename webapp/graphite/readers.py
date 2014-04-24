@@ -275,11 +275,12 @@ class RRDReader:
     return  retention_points * info['step']
 
 class MetricfireReader:
-   def __init__(self, mfurl, uid, metric, view = 'avg'):
+   def __init__(self, mfurl, uid, metric, view = 'avg', session=None):
       self._mfurl = mfurl
       self._uid = uid
       self._metric = metric
       self._view = view
+      self.sesh = session
 
    def get_intervals(self):
       # TODO
@@ -290,7 +291,10 @@ class MetricfireReader:
       before = time.time()
       
       try:
-         response = requests.get("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view), timeout = settings.MFTIMEOUT)
+         if self.sesh is None:
+            response = requests.get("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view), timeout = settings.MFTIMEOUT)
+         else:
+            response = self.sesh.get("%s/%s/fetch/%s?start=%d&end=%d&view=%s" % (self._mfurl, self._uid, self._metric, startTime, endTime, self._view), timeout = settings.MFTIMEOUT)
       except requests.exceptions.Timeout:
          graphiteudp.send("reader.timeout", 1)
          response = None
