@@ -115,7 +115,7 @@ def fetchData(requestContext, pathExpr):
       metric_count = len(fetches) + len(list(matching_nodes)) # matching_nodes is a generator
       # TODO Stop using syslog here and use the built in logging, but
       # after it has been reconfigured to log to syslog.
-      syslog.syslog("graphite datalib aborted fetching for a graph because it look longer than %2.2fs uid=%s metric_count=%d metrics_fetched=%d" % (settings.FETCH_TIMEOUT, requestContext['uid'], metric_count, len(fetches)))
+      syslog.syslog("graphite datalib aborted fetching for a graph because it took longer than %2.2fs uid=%s metric_count=%d metrics_fetched=%d" % (settings.FETCH_TIMEOUT, requestContext['uid'], metric_count, len(fetches)))
       break
 
   for node, results in fetches:
