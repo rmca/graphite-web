@@ -18,6 +18,8 @@ from graphite.storage import STORE
 from graphite.readers import FetchInProgress
 import datetime
 import pytz
+import syslog
+import settings
 
 
 class TimeSeries(list):
@@ -100,7 +102,21 @@ def fetchData(requestContext, pathExpr):
   endTime = int((requestContext['endTime'] - epoch).total_seconds())
 
   matching_nodes = STORE.find(requestContext['uid'], pathExpr, startTime, endTime, local=requestContext['localOnly'])
-  fetches = [(node, node.fetch(startTime, endTime)) for node in matching_nodes if node.is_leaf]
+  #fetches = [(node, node.fetch(startTime, endTime)) for node in matching_nodes if node.is_leaf]
+
+  fetches = []
+  fetch_start_time = time.time()
+
+  for node in matching_nodes:
+    if node.is_leaf:
+      fetches.append((node, node.fetch(startTime, endTime)))
+ 
+    if time.time() - fetch_start_time > settings.FETCH_TIMEOUT:
+      metric_count = len(fetches) + len(list(matching_nodes)) # matching_nodes is a generator
+      # TODO Stop using syslog here and use the built in logging, but
+      # after it has been reconfigured to log to syslog.
+      syslog.syslog("graphite datalib aborted fetching for a graph because it look longer than %2.2fs uid=%s metric_count=%d metrics_fetched=%d" % (settings.FETCH_TIMEOUT, requestContext['uid'], metric_count, len(fetches)))
+      break
 
   for node, results in fetches:
     if isinstance(results, FetchInProgress):

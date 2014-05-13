@@ -14,6 +14,9 @@ import logging
 import marisa_trie
 import re
 import time
+import requests
+
+sesh = requests.Session()
 
 #setDefaultSliceCachingBehavior('all')
 
@@ -36,6 +39,8 @@ class CeresFinder:
 
       elif isdir(fs_path):
         yield BranchNode(metric_path)
+
+sesh = requests.Session()
 
 class MetricfireFinder:
    def __init__(self, mfurl):#, redishostport):
@@ -90,7 +95,7 @@ class MetricfireFinder:
          for metric in metrics:
             levels = metric.split(".")
             if len(levels) == 1:
-               yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
+               yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view, session=sesh))
             else:
                # Don't produce the same branch node a bajillion times because other parts of Graphite
                # seem to be slow at deuping it.
@@ -122,7 +127,7 @@ class MetricfireFinder:
             if len(levels) == levels_in_pattern:
                # Leaf node
                #print "leaf:  ", metric
-               yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
+               yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view, session=sesh))
             else:
                # Branch node
                branch = ".".join(levels[:levels_in_pattern])
@@ -155,7 +160,7 @@ class MetricfireFinder:
                      
                   continue
 
-            yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view))
+            yield LeafNode(metric + suffix, MetricfireReader(self._mfurl, uid, metric, view, session=sesh))
 
 class StandardFinder:
   DATASOURCE_DELIMETER = '::RRD_DATASOURCE::'
