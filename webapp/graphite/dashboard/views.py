@@ -149,8 +149,9 @@ def dashboard(request, slug=None):
 
   if slug is not None:
     try:
-      dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
-    except Dashboard.DoesNotExist:
+      # dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
+      dashboard = Dashboard.objects.filter(owners=request.user, slug=slug)[0]
+    except (Dashboard.DoesNotExist, IndexError):
       context['initialError'] = "Dashboard '%s' does not exist." % slug
     else:
       context['initialState'] = dashboard.state
@@ -186,9 +187,10 @@ def save(request):
 
   try:
     # Find a dashboard by this name for the user who owns it.
-    dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
+    # dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
+    dashboard = Dashboard.objects.filter(owners=request.user, slug=slug)[0]
 
-  except Dashboard.DoesNotExist:
+  except (Dashboard.DoesNotExist, IndexError):
     # Save a dashboard with the correct owner information.
     profile = getProfile(request,allowDefault=False)
     dashboard = Dashboard()
@@ -214,8 +216,9 @@ def load(request, slug):
 
 
   try:
-    dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
-  except Dashboard.DoesNotExist:
+    # dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
+    dashboard = Dashboard.objects.filter(owners=request.user, slug=slug)[0]
+  except (Dashboard.DoesNotExist, IndexError):
     return json_response( dict(error="Dashboard '%s' does not exist. " % slug) )
 
   return json_response( dict(state=json.loads(dashboard.state), slug=dashboard.slug) )
@@ -226,7 +229,7 @@ def delete(request, slug):
     return json_response( dict(error="Must be logged in with appropriate permissions to delete") )
 
   try:
-    dashboard = Dashboard.objects.get(slug=slug, owners__user=request.user)
+    dashboard = Dashboard.objects.filter(slug=slug, owners=request.user)
   except Dashboard.DoesNotExist:
     return json_response( dict(error="Dashboard '%s' does not exist. " % slug) )
   else:
